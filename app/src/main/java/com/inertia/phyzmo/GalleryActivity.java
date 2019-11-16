@@ -108,11 +108,7 @@ public class GalleryActivity extends AppCompatActivity {
                 Uri videoUri = data.getData();
                 String path = Utils.getPathFromURI(this, videoUri);
 
-                Intent intent = new Intent(getApplicationContext(), DisplayDataActivity.class);
-                Bundle mBundle = new Bundle();
-                mBundle.putString("video_url", path);
-                intent.putExtras(mBundle);
-                startActivity(intent);
+                FirebaseUtils.uploadFile(this, path);
             }
         }
     }

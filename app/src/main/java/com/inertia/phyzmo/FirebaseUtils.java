@@ -1,8 +1,10 @@
 package com.inertia.phyzmo;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -70,9 +72,13 @@ public class FirebaseUtils {
                         riversRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                TextView t = a.findViewById(R.id.statusText);
-                                t.setText("Processing File");
-                                trackObjects(a, riversRef.getName());
+                                Intent intent = new Intent(a, DisplayDataActivity.class);
+                                Bundle mBundle = new Bundle();
+                                mBundle.putString("video_url", riversRef.getName());
+                                intent.putExtras(mBundle);
+                                a.startActivity(intent);
+                                //TextView t = a.findViewById(R.id.statusText);
+                                //t.setText("Processing File");
                             }
                         });
                     }
@@ -228,7 +234,7 @@ public class FirebaseUtils {
         List<DataEntry> seriesData = new ArrayList<>();
         Cartesian cartesian = AnyChart.line();
         String parsedMode = mode.toLowerCase().replace(" ", "_");
-        System.out.println(parsedMode);
+        System.out.println("Parse Mode: " + parsedMode);
         try {
             JSONArray timeArray = jsonObject.getJSONArray("time");
             JSONArray normalizedVelocity = jsonObject.getJSONArray(parsedMode);

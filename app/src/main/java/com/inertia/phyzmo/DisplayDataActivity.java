@@ -12,7 +12,8 @@ public class DisplayDataActivity extends AppCompatActivity {
         setContentView(R.layout.activity_graphs);
 
         System.out.println(getIntent().getExtras().getString("video_url"));
-        FirebaseUtils.uploadFile(this, getIntent().getExtras().getString("video_url"));
+        FirebaseUtils.trackObjects(this, getIntent().getExtras().getString("video_url"));
+        //FirebaseUtils.uploadFile(this, getIntent().getExtras().getString("video_url"));
     }
 
 }

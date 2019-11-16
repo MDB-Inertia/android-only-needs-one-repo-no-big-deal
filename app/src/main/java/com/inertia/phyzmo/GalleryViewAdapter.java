@@ -2,7 +2,9 @@ package com.inertia.phyzmo;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
+import android.os.Bundle;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,7 +39,7 @@ public class GalleryViewAdapter extends RecyclerView.Adapter<GalleryViewAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         final Display display = ((Activity)mContext).getWindowManager().getDefaultDisplay();
         final Point size = new Point();
         display.getSize(size);
@@ -47,6 +49,18 @@ public class GalleryViewAdapter extends RecyclerView.Adapter<GalleryViewAdapter.
                 .override((int) (size.x / 5), (int) (size.x / 4))
                 .centerCrop()
                 .into(holder.thumbnail);
+
+        holder.thumbnail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("Thumbnail for video with ID=" + mData.get(position) + " clicked.");
+                Intent intent = new Intent(mContext, DisplayDataActivity.class);
+                Bundle mBundle = new Bundle();
+                mBundle.putString("video_url", mData.get(position) + ".mp4");
+                intent.putExtras(mBundle);
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     @Override
