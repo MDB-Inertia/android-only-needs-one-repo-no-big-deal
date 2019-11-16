@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Phyzmo</string>
+    <string-array name="graph_choices">
+        <item>Total Distance</item>
+        <item>Velocity</item>
+        <item>Normalized Velocity</item>
+        <item>Acceleration</item>
+        <item>Normalized Acceleration</item>
+    </string-array>
+</resources>
