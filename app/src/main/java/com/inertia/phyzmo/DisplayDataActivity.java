@@ -92,7 +92,7 @@ public class DisplayDataActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         if (Util.SDK_INT >= 24) {
-            initializePlayer();
+            //initializePlayer();
         }
     }
 
@@ -100,7 +100,7 @@ public class DisplayDataActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         if ((Util.SDK_INT < 24 || player == null)) {
-            initializePlayer();
+            //initializePlayer();
         }
     }
 
@@ -120,11 +120,11 @@ public class DisplayDataActivity extends AppCompatActivity {
         }
     }
 
-    private void initializePlayer() {
+    public void initializePlayer(String videoUrl) {
         player = ExoPlayerFactory.newSimpleInstance(this);
         playerView.setPlayer(player);
 
-        Uri uri = Uri.parse("https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_30mb.mp4");
+        Uri uri = Uri.parse(videoUrl);
         MediaSource mediaSource = buildMediaSource(uri);
         player.setPlayWhenReady(playWhenReady);
         player.seekTo(currentWindow, playbackPosition);

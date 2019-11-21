@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -209,9 +210,11 @@ public class FirebaseUtils {
     static class DataComputationRequest extends RequestTask {
 
         public Activity activity;
+        String fileName;
 
-        public DataComputationRequest(Activity a) {
+        public DataComputationRequest(Activity a, String filename) {
             this.activity = a;
+            this.fileName = filename;
         }
 
         @Override
@@ -245,6 +248,8 @@ public class FirebaseUtils {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            ((DisplayDataActivity)(activity)).initializePlayer("https://storage.googleapis.com/phyzmo.appspot.com/" + fileName);
 
             final Spinner staticSpinner = activity.findViewById(R.id.chooseGraph);
             staticSpinner.setVisibility(View.VISIBLE);

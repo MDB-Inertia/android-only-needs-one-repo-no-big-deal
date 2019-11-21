@@ -77,7 +77,7 @@ public class MultipleSelectionSpinner extends AppCompatSpinner implements
                 String selectedList = buildSelectedItemString().replace(" ", "%20");
                 String executedURL = "https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + fileName.replace(".mp4", ".json") + "&obj_descriptions=[" + selectedList + "]&ref_list=[[0.121,0.215],[0.9645,0.446],0.60]";
                 System.out.println(executedURL);
-                new FirebaseUtils.DataComputationRequest(activity).execute(executedURL);
+                new FirebaseUtils.DataComputationRequest(activity, fileName).execute(executedURL);
             }
         });
         builder.show();
