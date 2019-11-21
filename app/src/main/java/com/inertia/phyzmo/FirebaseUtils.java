@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -23,8 +22,15 @@ import com.anychart.data.Mapping;
 import com.anychart.data.Set;
 import com.anychart.enums.Anchor;
 import com.anychart.enums.MarkerType;
+import com.github.rtoshiro.view.video.FullscreenVideoLayout;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -174,6 +180,28 @@ public class FirebaseUtils {
             mss.setItems(keyList);
             mss.setVisibility(View.VISIBLE);
             activity.findViewById(R.id.statusText).setVisibility(View.INVISIBLE);
+            final FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference userRef = database.getReference("Users");
+            final DatabaseReference specific_user = userRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            specific_user.addListenerForSingleValueEvent(
+                    new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            ArrayList<String> videoIds = new ArrayList<>();
+                            for (DataSnapshot d: dataSnapshot.child("videoId").getChildren()) {
+                                videoIds.add(d.getValue().toString());
+                            }
+                            if (!videoIds.contains(name.replace(".mp4", ""))) {
+                                videoIds.add(name.replace(".mp4", ""));
+                                specific_user.child("videoId").setValue(videoIds);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+
             //new DataComputationRequest(this.activity).execute("https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + name.replace(".mp4", ".json") + "&obj_descriptions=[%27shoe%27]&ref_list=[[0.121,0.215],[0.9645,0.446],0.60]");
         }
     }
@@ -201,6 +229,22 @@ public class FirebaseUtils {
             }
 
             setChart(acv, "Total Distance");
+
+            try {
+                List<SampleObject> data = new ArrayList<>();
+                for (int i = 0; i < jsonObject.getJSONArray("time").length(); i++) {
+                    data.add(new SampleObject(
+                            jsonObject.getJSONArray("time").get(i).toString(),
+                            jsonObject.getJSONArray("total_distance").get(i).toString(),
+                            jsonObject.getJSONArray("velocity").get(i).toString(),
+                            jsonObject.getJSONArray("acceleration").get(i).toString()
+                    ));
+                }
+                TableMainLayout table = activity.findViewById(R.id.tableLayout);
+                table.setData(data);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             final Spinner staticSpinner = activity.findViewById(R.id.chooseGraph);
             staticSpinner.setVisibility(View.VISIBLE);
