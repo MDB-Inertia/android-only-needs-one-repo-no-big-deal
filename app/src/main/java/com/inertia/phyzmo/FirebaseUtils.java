@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -164,6 +165,8 @@ public class FirebaseUtils {
                 public void onClick(View v) {
                     System.out.println("Analyzing just the following: " + objectSelectionAdapter.getSelectedItemsAsString());
                     activity.findViewById(R.id.statusText).setVisibility(View.VISIBLE);
+                    ImageView loadingImage = activity.findViewById(R.id.loadingGif);
+                    loadingImage.setVisibility(View.VISIBLE);
                     activity.findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
                     activity.findViewById(R.id.saveObjectsChosen).setVisibility(View.INVISIBLE);
                     TextView t = activity.findViewById(R.id.statusText);
@@ -189,9 +192,15 @@ public class FirebaseUtils {
 
             System.out.println(result);
             activity.findViewById(R.id.statusText).setVisibility(View.INVISIBLE);
+            ImageView loadingImage = activity.findViewById(R.id.loadingGif);
+            loadingImage.setVisibility(View.INVISIBLE);
 
             Button showObjectChooser = activity.findViewById(R.id.displayObjectChooser);
             showObjectChooser.callOnClick();
+
+            activity.findViewById(R.id.displayVideo).setEnabled(false);
+            activity.findViewById(R.id.displayChart).setEnabled(false);
+            activity.findViewById(R.id.displayGraph).setEnabled(false);
 
             addVideoIdToUser(name.replace(".mp4", ""), FirebaseAuth.getInstance().getCurrentUser());
             //new DataComputationRequest(this.activity).execute("https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + name.replace(".mp4", ".json") + "&obj_descriptions=[%27shoe%27]&ref_list=[[0.121,0.215],[0.9645,0.446],0.60]");
@@ -215,6 +224,7 @@ public class FirebaseUtils {
             System.out.println("Data Computation Result: " + result);
 
             activity.findViewById(R.id.statusText).setVisibility(View.INVISIBLE);
+            activity.findViewById(R.id.loadingGif).setVisibility(View.INVISIBLE);
 
             try {
                 jsonObject = new JSONObject(result);
@@ -384,6 +394,8 @@ public class FirebaseUtils {
                     activity.findViewById(R.id.saveObjectsChosen).setVisibility(View.INVISIBLE);
                     TextView t = activity.findViewById(R.id.statusText);
                     t.setText("Analyzing Objects");
+                    ImageView loadingImage = activity.findViewById(R.id.loadingGif);
+                    loadingImage.setVisibility(View.VISIBLE);
                     String selectedList = objectSelectionAdapter.buildSelectedItemString().replace(" ", "%20");
                     String executedURL = "https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + videoId + ".json" + "&obj_descriptions=[" + selectedList + "]&ref_list=[[0.121,0.215],[0.9645,0.446],0.60]";
                     System.out.println(executedURL);

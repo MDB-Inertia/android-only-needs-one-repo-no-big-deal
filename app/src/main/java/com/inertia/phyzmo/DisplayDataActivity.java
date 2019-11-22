@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,6 +22,8 @@ import com.google.android.exoplayer2.util.Util;
 import java.util.ArrayList;
 
 public class DisplayDataActivity extends AppCompatActivity {
+
+    TextView statusLine;
 
     Button showVideo;
     Button showChart;
@@ -42,6 +45,8 @@ public class DisplayDataActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graphs);
+
+        statusLine = findViewById(R.id.statusText);
 
         showVideo = findViewById(R.id.displayVideo);
         showChart = findViewById(R.id.displayChart);
@@ -139,6 +144,7 @@ public class DisplayDataActivity extends AppCompatActivity {
             FirebaseUtils.trackObjects(this, getIntent().getExtras().getString("video_url"));
         } else {
             FirebaseUtils.openExistingVideo(getIntent().getExtras().getString("video_url").replace(".mp4", ""),this);
+            statusLine.setText("Gathering data...");
         }
         //FirebaseUtils.uploadFile(this, getIntent().getExtras().getString("video_url"));
     }

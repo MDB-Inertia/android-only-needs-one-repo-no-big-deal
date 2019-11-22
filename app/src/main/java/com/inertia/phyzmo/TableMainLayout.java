@@ -77,6 +77,11 @@ public class TableMainLayout extends RelativeLayout {
 
         this.sampleObjectList = data;
 
+        tableA.removeAllViews();
+        tableB.removeAllViews();
+        tableC.removeAllViews();
+        tableD.removeAllViews();
+
         // add some table rows
         this.addTableRowToTableA();
         this.addTableRowToTableB();

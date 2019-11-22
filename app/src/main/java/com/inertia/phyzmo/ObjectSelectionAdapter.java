@@ -72,7 +72,8 @@ public class ObjectSelectionAdapter extends RecyclerView.Adapter<ObjectSelection
                     sb.append(", ");
                 }
                 foundOne = true;
-                sb.append(mData.get(i).getName().toLowerCase());
+                String itemName = Utils.escapeStringUrl(mData.get(i).getName().toLowerCase());
+                sb.append(itemName);
             }
         }
         return sb.toString();
@@ -88,7 +89,8 @@ public class ObjectSelectionAdapter extends RecyclerView.Adapter<ObjectSelection
                     sb.append(",");
                 }
                 foundOne = true;
-                sb.append("'" + mData.get(i).getName().toLowerCase() + "'");
+                String itemName = Utils.escapeStringUrl(mData.get(i).getName().toLowerCase());
+                sb.append("'" + itemName + "'");
             }
         }
         return sb.toString();

@@ -65,4 +65,7 @@ dependencies {
 
     // CustomCheckBox
     implementation 'net.igenius:customcheckbox:1.3'
+
+    // GifPlayer
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.17'
 }

@@ -19,7 +19,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.regex.Matcher;
@@ -186,8 +185,14 @@ public class Utils {
                 sb.append(", ");
             }
             foundOne = true;
-            sb.append("'" + data.get(i).toLowerCase() + "'");
+            sb.append("'" + escapeStringUrl(data.get(i).toLowerCase()) + "'");
         }
         return sb.toString();
+    }
+
+    public static String escapeStringUrl(String str) {
+        return str.replace(" ", "%20").replace("&", "%26")
+                    .replace("\"", "\'").replace("[", "%5B")
+                    .replace("]", "%5D");
     }
 }
