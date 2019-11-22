@@ -3,16 +3,27 @@ package com.inertia.phyzmo;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
+import com.androidplot.xy.LineAndPointFormatter;
+import com.androidplot.xy.SimpleXYSeries;
+import com.androidplot.xy.XYPlot;
+import com.androidplot.xy.XYSeries;
+
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
     public static String getPathFromURI(final Context context, final Uri uri) {
@@ -119,5 +130,64 @@ public class Utils {
             }
         }
         return result;
+    }
+    public static String capitalizeTitle(String input) {
+        Pattern pattern = Pattern.compile("\\b([a-z])([\\w]*)");
+        Matcher matcher = pattern.matcher(input);
+        StringBuffer buffer = new StringBuffer();
+        while (matcher.find()) {
+            matcher.appendReplacement(buffer, matcher.group(1).toUpperCase() + matcher.group(2));
+        }
+        String capitalized = matcher.appendTail(buffer).toString();
+        return capitalized;
+    }
+
+    public static ArrayList<String> getKeysOfJSONObject(String json) {
+        JSONObject jsonObject = null;
+        ArrayList<String> keyList = new ArrayList<>();
+        try {
+            jsonObject = new JSONObject(json);
+            Iterator<String> keys = jsonObject.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                keyList.add(key);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return keyList;
+    }
+
+    public static void setChart(XYPlot chart, String mode, JSONObject jsonObject) {
+        String parsedMode = mode.toLowerCase().replace(" ", "_");
+        System.out.println("Parse Mode: " + parsedMode);
+        chart.clear();
+        chart.setTitle(mode + " vs. Time");
+        chart.setRangeLabel(mode);
+        try {
+            JSONArray timeArray = jsonObject.getJSONArray("time");
+            JSONArray dataSet = jsonObject.getJSONArray(parsedMode);
+            XYSeries series1 = new SimpleXYSeries(Utils.jsonArrayToArrayList(timeArray), Utils.jsonArrayToArrayList(dataSet), mode);
+            LineAndPointFormatter series1Format = new LineAndPointFormatter(Color.LTGRAY, Color.BLUE, null, null);
+            series1Format.setLegendIconEnabled(false);
+            chart.addSeries(series1, series1Format);
+            chart.redraw();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String buildStringFromArray(ArrayList<String> data) {
+        StringBuilder sb = new StringBuilder();
+        boolean foundOne = false;
+
+        for (int i = 0; i < data.size(); ++i) {
+            if (foundOne) {
+                sb.append(", ");
+            }
+            foundOne = true;
+            sb.append("'" + data.get(i).toLowerCase() + "'");
+        }
+        return sb.toString();
     }
 }

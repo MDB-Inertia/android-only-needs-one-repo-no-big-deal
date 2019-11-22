@@ -44,7 +44,7 @@ public class GalleryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final GalleryViewAdapter adapter = new GalleryViewAdapter(this, new ArrayList<String>());
+        final GalleryViewAdapter adapter = new GalleryViewAdapter(this, new ArrayList<>());
 
         mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() == null) {

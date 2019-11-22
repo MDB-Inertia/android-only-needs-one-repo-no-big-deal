@@ -62,4 +62,7 @@ dependencies {
 
     // AndroidPlot
     implementation "com.androidplot:androidplot-core:1.5.7"
+
+    // CustomCheckBox
+    implementation 'net.igenius:customcheckbox:1.3'
 }

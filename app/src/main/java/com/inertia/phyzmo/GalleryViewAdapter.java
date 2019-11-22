@@ -57,6 +57,7 @@ public class GalleryViewAdapter extends RecyclerView.Adapter<GalleryViewAdapter.
                 Intent intent = new Intent(mContext, DisplayDataActivity.class);
                 Bundle mBundle = new Bundle();
                 mBundle.putString("video_url", mData.get(position) + ".mp4");
+                mBundle.putBoolean("existing_video", true);
                 intent.putExtras(mBundle);
                 mContext.startActivity(intent);
             }

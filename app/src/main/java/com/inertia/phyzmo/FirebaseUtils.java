@@ -2,24 +2,24 @@ package com.inertia.phyzmo;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.androidplot.xy.LineAndPointFormatter;
-import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
-import com.androidplot.xy.XYSeries;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,15 +36,12 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,10 +70,9 @@ public class FirebaseUtils {
                                 Intent intent = new Intent(a, DisplayDataActivity.class);
                                 Bundle mBundle = new Bundle();
                                 mBundle.putString("video_url", riversRef.getName());
+                                mBundle.putBoolean("existing_video", false);
                                 intent.putExtras(mBundle);
                                 a.startActivity(intent);
-                                //TextView t = a.findViewById(R.id.statusText);
-                                //t.setText("Processing File");
                             }
                         });
                     }
@@ -152,65 +148,71 @@ public class FirebaseUtils {
         @Override
         protected void onPostExecute(String result) {
             //super.onPostExecute(result);
-            JSONObject jsonObject = null;
-            List<String> keyList = new ArrayList<>();
-            try {
-                jsonObject = new JSONObject(result);
-                Iterator<String> keys = jsonObject.keys();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    System.out.println(key);
-                    keyList.add(key);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            ArrayList<String> keyList = Utils.getKeysOfJSONObject(result);
+
+            RecyclerView objectSelectionView = activity.findViewById(R.id.objectSelectionView);
+            ArrayList<ObjectChoiceModel> objectChoiceModels = new ArrayList<>();
+            for (int i = 0; i < keyList.size(); i++) {
+                objectChoiceModels.add(new ObjectChoiceModel(Utils.capitalizeTitle(keyList.get(i)), false));
             }
+
+            ObjectSelectionAdapter objectSelectionAdapter = (ObjectSelectionAdapter)objectSelectionView.getAdapter();
+            objectSelectionAdapter.setData(objectChoiceModels);
+            Button saveObjects = activity.findViewById(R.id.saveObjectsChosen);
+            saveObjects.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    System.out.println("Analyzing just the following: " + objectSelectionAdapter.getSelectedItemsAsString());
+                    activity.findViewById(R.id.statusText).setVisibility(View.VISIBLE);
+                    activity.findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
+                    activity.findViewById(R.id.saveObjectsChosen).setVisibility(View.INVISIBLE);
+                    TextView t = activity.findViewById(R.id.statusText);
+                    t.setText("Analyzing Objects");
+                    String selectedList = objectSelectionAdapter.buildSelectedItemString().replace(" ", "%20");
+                    String executedURL = "https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + name.replace(".mp4", ".json") + "&obj_descriptions=[" + selectedList + "]&ref_list=[[0.121,0.215],[0.9645,0.446],0.60]";
+                    System.out.println(executedURL);
+                    new FirebaseUtils.DataComputationRequest(activity, name, objectSelectionAdapter.getSelectedItems()).execute(executedURL);
+
+                    ArrayList<ArrayList<Double>> positions = new ArrayList<>();
+                    ArrayList<Double> firstPoint = new ArrayList<>();
+                    ArrayList<Double> secondPoint = new ArrayList<>();
+                    firstPoint.add(0.121);
+                    firstPoint.add(0.215);
+                    secondPoint.add(0.9645);
+                    secondPoint.add(0.446);
+                    positions.add(firstPoint);
+                    positions.add(secondPoint);
+                    double units = 0.60;
+                    FirebaseUtils.updateVideoDetails(name.replace(".mp4", ""), objectSelectionAdapter.getSelectedItems(), positions, units);
+                }
+            });
+
             System.out.println(result);
-            MultipleSelectionSpinner mss = activity.findViewById(R.id.chooseItems);
-            mss.setActivity(activity);
-            mss.setFilename(name);
-            mss.setItems(keyList);
-            mss.setVisibility(View.VISIBLE);
             activity.findViewById(R.id.statusText).setVisibility(View.INVISIBLE);
-            final FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference userRef = database.getReference("Users");
-            final DatabaseReference specific_user = userRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-            specific_user.addListenerForSingleValueEvent(
-                    new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            ArrayList<String> videoIds = new ArrayList<>();
-                            for (DataSnapshot d: dataSnapshot.child("videoId").getChildren()) {
-                                videoIds.add(d.getValue().toString());
-                            }
-                            if (!videoIds.contains(name.replace(".mp4", ""))) {
-                                videoIds.add(name.replace(".mp4", ""));
-                                specific_user.child("videoId").setValue(videoIds);
-                            }
-                        }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                        }
-                    });
+            Button showObjectChooser = activity.findViewById(R.id.displayObjectChooser);
+            showObjectChooser.callOnClick();
 
+            addVideoIdToUser(name.replace(".mp4", ""), FirebaseAuth.getInstance().getCurrentUser());
             //new DataComputationRequest(this.activity).execute("https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + name.replace(".mp4", ".json") + "&obj_descriptions=[%27shoe%27]&ref_list=[[0.121,0.215],[0.9645,0.446],0.60]");
         }
     }
 
     static class DataComputationRequest extends RequestTask {
 
-        public Activity activity;
-        String fileName;
+        private Activity activity;
+        private String fileName;
+        private ArrayList<String> preEnabledObjects;
 
-        public DataComputationRequest(Activity a, String filename) {
+        public DataComputationRequest(Activity a, String filename, ArrayList<String> preEnabledObjects) {
             this.activity = a;
             this.fileName = filename;
+            this.preEnabledObjects = preEnabledObjects;
         }
 
         @Override
         protected void onPostExecute(String result) {
-            System.out.println(result);
+            System.out.println("Data Computation Result: " + result);
 
             activity.findViewById(R.id.statusText).setVisibility(View.INVISIBLE);
 
@@ -221,7 +223,7 @@ public class FirebaseUtils {
             }
 
             XYPlot plot = activity.findViewById(R.id.chartDisplay);
-            setChart(plot, "Total Distance");
+            Utils.setChart(plot, "Total Distance", jsonObject);
             plot.setVisibility(View.VISIBLE);
 
             try {
@@ -240,6 +242,8 @@ public class FirebaseUtils {
                 e.printStackTrace();
             }
 
+            new PopulateObjectPossibilites(activity, fileName.replace(".mp4", ""), preEnabledObjects).execute("https://storage.googleapis.com/phyzmo-videos/" + fileName.replace(".mp4", ".json"));
+
             ((DisplayDataActivity)(activity)).initializePlayer("https://storage.googleapis.com/phyzmo.appspot.com/" + fileName);
 
             final Spinner staticSpinner = activity.findViewById(R.id.chooseGraph);
@@ -257,7 +261,7 @@ public class FirebaseUtils {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view,
                                            int position, long id) {
-                    setChart(plot, staticAdapter.getItem(position).toString());
+                    Utils.setChart(plot, staticAdapter.getItem(position).toString(), jsonObject);
                 }
 
                 @Override
@@ -271,23 +275,133 @@ public class FirebaseUtils {
         }
     }
 
-    static private void setChart(XYPlot chart, String mode) {
-        String parsedMode = mode.toLowerCase().replace(" ", "_");
-        System.out.println("Parse Mode: " + parsedMode);
-        chart.clear();
-        chart.setTitle(mode + " vs. Time");
-        chart.setRangeLabel(mode);
-        try {
-            JSONArray timeArray = jsonObject.getJSONArray("time");
-            JSONArray dataSet = jsonObject.getJSONArray(parsedMode);
-            XYSeries series1 = new SimpleXYSeries(Utils.jsonArrayToArrayList(timeArray), Utils.jsonArrayToArrayList(dataSet), mode);
-            LineAndPointFormatter series1Format = new LineAndPointFormatter(Color.LTGRAY, Color.BLUE, null, null);
-            series1Format.setLegendIconEnabled(false);
-            chart.addSeries(series1, series1Format);
-            chart.redraw();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    public static void addVideoIdToUser(String videoId, FirebaseUser user) {
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference userRef = database.getReference("Users");
+        final DatabaseReference specific_user = userRef.child(user.getUid());
+        specific_user.addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        ArrayList<String> videoIds = new ArrayList<>();
+                        for (DataSnapshot d: dataSnapshot.child("videoId").getChildren()) {
+                            videoIds.add(d.getValue().toString());
+                        }
+                        if (!videoIds.contains(videoId)) {
+                            videoIds.add(videoId);
+                            specific_user.child("videoId").setValue(videoIds);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
     }
 
+    public static void updateVideoDetails(String videoId, ArrayList<String> objects, ArrayList<ArrayList<Double>> positions, double units) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference videosRef = database.getReference("Videos");
+        DatabaseReference videoRef = videosRef.child(videoId);
+        videoRef.child("objects_selected").setValue(objects);
+        videoRef.child("unit").setValue(units);
+        videoRef.child("line").setValue(positions);
+    }
+
+    public static void openExistingVideo(String id, Activity a) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference videosRef = database.getReference("Videos");
+        DatabaseReference videoRef = videosRef.child(id);
+        videoRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+
+                    ArrayList<String> selectedObjects = new ArrayList<>();
+                    for (DataSnapshot d: dataSnapshot.child("objects_selected").getChildren()) {
+                        selectedObjects.add(d.getValue().toString());
+                    }
+                    String selectedList = Utils.buildStringFromArray(selectedObjects).replace(" ", "%20");
+                    String executedURL = "https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + id + ".json&obj_descriptions=[" + selectedList + "]&ref_list=[[0.121,0.215],[0.9645,0.446],0.60]";
+                    System.out.println(executedURL);
+                    new FirebaseUtils.DataComputationRequest(a, id+".mp4", selectedObjects).execute(executedURL);
+                } else {
+                    System.err.println("Video does not exit in Videos list in Firebase.");
+                    FirebaseUtils.trackObjects(a, id + ".mp4");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    static class PopulateObjectPossibilites extends RequestTask {
+        private Activity activity;
+        private String videoId;
+        private ArrayList<String> preEnabledObjects;
+
+        public PopulateObjectPossibilites(Activity a, String videoId, ArrayList<String> preEnabledObjects) {
+            this.activity = a;
+            this.videoId = videoId;
+            this.preEnabledObjects = preEnabledObjects;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            activity.findViewById(R.id.statusText).setVisibility(View.INVISIBLE);
+
+            System.out.println("Populate Possibilities Result: " + result);
+
+            try {
+                jsonObject = new JSONObject(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            ArrayList<String> keyList = Utils.getKeysOfJSONObject(result);
+
+            RecyclerView objectSelectionView = activity.findViewById(R.id.objectSelectionView);
+            ArrayList<ObjectChoiceModel> objectChoiceModels = new ArrayList<>();
+            for (int i = 0; i < keyList.size(); i++) {
+                if (preEnabledObjects.contains(keyList.get(i))) {
+                    //System.out.println("Populating " + keyList.get(i) + " because it is in the pre-enabled object list.");
+                }
+                objectChoiceModels.add(new ObjectChoiceModel(Utils.capitalizeTitle(keyList.get(i)), preEnabledObjects.contains(keyList.get(i))));
+            }
+
+            ObjectSelectionAdapter objectSelectionAdapter = (ObjectSelectionAdapter)objectSelectionView.getAdapter();
+            objectSelectionAdapter.setData(objectChoiceModels);
+            Button saveObjects = activity.findViewById(R.id.saveObjectsChosen);
+            saveObjects.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    System.out.println("Analyzing just the following: " + objectSelectionAdapter.getSelectedItemsAsString());
+                    activity.findViewById(R.id.statusText).setVisibility(View.VISIBLE);
+                    activity.findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
+                    activity.findViewById(R.id.saveObjectsChosen).setVisibility(View.INVISIBLE);
+                    TextView t = activity.findViewById(R.id.statusText);
+                    t.setText("Analyzing Objects");
+                    String selectedList = objectSelectionAdapter.buildSelectedItemString().replace(" ", "%20");
+                    String executedURL = "https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + videoId + ".json" + "&obj_descriptions=[" + selectedList + "]&ref_list=[[0.121,0.215],[0.9645,0.446],0.60]";
+                    System.out.println(executedURL);
+                    new FirebaseUtils.DataComputationRequest(activity, videoId + ".mp4", objectSelectionAdapter.getSelectedItems()).execute(executedURL);
+
+                    ArrayList<ArrayList<Double>> positions = new ArrayList<>();
+                    ArrayList<Double> firstPoint = new ArrayList<>();
+                    ArrayList<Double> secondPoint = new ArrayList<>();
+                    firstPoint.add(0.121);
+                    firstPoint.add(0.215);
+                    secondPoint.add(0.9645);
+                    secondPoint.add(0.446);
+                    positions.add(firstPoint);
+                    positions.add(secondPoint);
+                    double units = 0.60;
+                    FirebaseUtils.updateVideoDetails(videoId, objectSelectionAdapter.getSelectedItems(), positions, units);
+                }
+            });
+        }
+    }
 }

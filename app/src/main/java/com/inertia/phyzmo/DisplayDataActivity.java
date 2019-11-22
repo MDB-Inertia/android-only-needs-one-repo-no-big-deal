@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -16,12 +18,19 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
+import java.util.ArrayList;
+
 public class DisplayDataActivity extends AppCompatActivity {
 
     Button showVideo;
     Button showChart;
     Button showGraph;
+    Button showObjectChooser;
+
+    Button saveObjectSettings;
+
     PlayerView playerView;
+    RecyclerView objectSelectionView;
 
     private boolean playWhenReady = false;
     private int currentWindow = 0;
@@ -37,6 +46,9 @@ public class DisplayDataActivity extends AppCompatActivity {
         showVideo = findViewById(R.id.displayVideo);
         showChart = findViewById(R.id.displayChart);
         showGraph = findViewById(R.id.displayGraph);
+        showObjectChooser = findViewById(R.id.displayObjectChooser);
+
+        saveObjectSettings = findViewById(R.id.saveObjectsChosen);
 
         playerView = findViewById(R.id.video_view);
 
@@ -45,50 +57,89 @@ public class DisplayDataActivity extends AppCompatActivity {
         showVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("Video option chosen");
+                //System.out.println("Video option chosen");
                 initializePlayer(videoUrl);
                 showVideo.setEnabled(false);
                 showChart.setEnabled(true);
                 showGraph.setEnabled(true);
+                showObjectChooser.setEnabled(true);
                 findViewById(R.id.video_view).setVisibility(View.VISIBLE);
                 findViewById(R.id.chartDisplay).setVisibility(View.INVISIBLE);
                 findViewById(R.id.chooseGraph).setVisibility(View.INVISIBLE);
                 findViewById(R.id.tableLayout).setVisibility(View.INVISIBLE);
+                findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
+                saveObjectSettings.setVisibility(View.INVISIBLE);
             }
         });
 
         showChart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("Chart option chosen");
+                //System.out.println("Chart option chosen");
                 releasePlayer();
                 showVideo.setEnabled(true);
                 showChart.setEnabled(false);
                 showGraph.setEnabled(true);
+                showObjectChooser.setEnabled(true);
                 findViewById(R.id.video_view).setVisibility(View.INVISIBLE);
                 findViewById(R.id.chartDisplay).setVisibility(View.INVISIBLE);
                 findViewById(R.id.chooseGraph).setVisibility(View.INVISIBLE);
                 findViewById(R.id.tableLayout).setVisibility(View.VISIBLE);
+                findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
+                saveObjectSettings.setVisibility(View.INVISIBLE);
             }
         });
 
         showGraph.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("Graph option chosen");
+                //System.out.println("Graph option chosen");
                 releasePlayer();
                 showVideo.setEnabled(true);
                 showChart.setEnabled(true);
                 showGraph.setEnabled(false);
+                showObjectChooser.setEnabled(true);
                 findViewById(R.id.video_view).setVisibility(View.INVISIBLE);
                 findViewById(R.id.chartDisplay).setVisibility(View.VISIBLE);
                 findViewById(R.id.chooseGraph).setVisibility(View.VISIBLE);
                 findViewById(R.id.tableLayout).setVisibility(View.INVISIBLE);
+                findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
+                saveObjectSettings.setVisibility(View.INVISIBLE);
             }
         });
 
+        showObjectChooser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //System.out.println("Graph option chosen");
+                releasePlayer();
+                showVideo.setEnabled(true);
+                showChart.setEnabled(true);
+                showGraph.setEnabled(true);
+                showObjectChooser.setEnabled(false);
+                findViewById(R.id.video_view).setVisibility(View.INVISIBLE);
+                findViewById(R.id.chartDisplay).setVisibility(View.INVISIBLE);
+                findViewById(R.id.chooseGraph).setVisibility(View.INVISIBLE);
+                findViewById(R.id.tableLayout).setVisibility(View.INVISIBLE);
+                findViewById(R.id.objectSelectionView).setVisibility(View.VISIBLE);
+                saveObjectSettings.setVisibility(View.VISIBLE);
+            }
+        });
+
+        objectSelectionView = findViewById(R.id.objectSelectionView);
+        ArrayList<ObjectChoiceModel> data = new ArrayList<>();
+        objectSelectionView.setLayoutManager(new LinearLayoutManager(this));
+        ObjectSelectionAdapter adapter = new ObjectSelectionAdapter(getApplicationContext(), data, this);
+        adapter.notifyDataSetChanged();
+        objectSelectionView.setAdapter(adapter);
+
+
         System.out.println(getIntent().getExtras().getString("video_url"));
-        FirebaseUtils.trackObjects(this, getIntent().getExtras().getString("video_url"));
+        if (!getIntent().getExtras().getBoolean("existing_video")) {
+            FirebaseUtils.trackObjects(this, getIntent().getExtras().getString("video_url"));
+        } else {
+            FirebaseUtils.openExistingVideo(getIntent().getExtras().getString("video_url").replace(".mp4", ""),this);
+        }
         //FirebaseUtils.uploadFile(this, getIntent().getExtras().getString("video_url"));
     }
 
@@ -152,5 +203,4 @@ public class DisplayDataActivity extends AppCompatActivity {
             player = null;
         }
     }
-
 }
