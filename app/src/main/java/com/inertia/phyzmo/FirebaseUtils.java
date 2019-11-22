@@ -37,6 +37,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -267,11 +268,20 @@ public class FirebaseUtils {
 
             staticSpinner.setAdapter(staticAdapter);
 
+            String jsonCopy = jsonObject.toString();
+
             staticSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view,
                                            int position, long id) {
-                    Utils.setChart(plot, staticAdapter.getItem(position).toString(), jsonObject);
+                    JSONObject temp = null;
+                    try {
+                        temp = new JSONObject(jsonCopy);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("Updating chart with this JSONObject: " + temp);
+                    Utils.setChart(plot, staticAdapter.getItem(position).toString(), temp);
                 }
 
                 @Override
