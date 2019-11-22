@@ -49,7 +49,7 @@ public class ObjectSelectionAdapter extends RecyclerView.Adapter<ObjectSelection
             @Override
             public void onClick(View v) {
                 CustomCheckBox checkbox = (CustomCheckBox) v;
-                checkbox.setChecked(!checkbox.isChecked());
+                checkbox.setChecked(!checkbox.isChecked(), true);
                 mData.get(position).setEnabled(checkbox.isChecked());
                 updateSelectButton();
             }

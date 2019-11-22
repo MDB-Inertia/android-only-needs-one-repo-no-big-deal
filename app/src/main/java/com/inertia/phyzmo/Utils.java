@@ -19,6 +19,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.regex.Matcher;
@@ -194,5 +196,13 @@ public class Utils {
         return str.replace(" ", "%20").replace("&", "%26")
                     .replace("\"", "\'").replace("[", "%5B")
                     .replace("]", "%5D");
+    }
+
+    public static String round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(Double.toString(value));
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.toString();
     }
 }

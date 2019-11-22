@@ -32,6 +32,8 @@ public class DisplayDataActivity extends AppCompatActivity {
 
     Button saveObjectSettings;
 
+    Button goBack;
+
     PlayerView playerView;
     RecyclerView objectSelectionView;
 
@@ -54,6 +56,14 @@ public class DisplayDataActivity extends AppCompatActivity {
         showObjectChooser = findViewById(R.id.displayObjectChooser);
 
         saveObjectSettings = findViewById(R.id.saveObjectsChosen);
+
+        goBack = findViewById(R.id.home_button);
+        goBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         playerView = findViewById(R.id.video_view);
 

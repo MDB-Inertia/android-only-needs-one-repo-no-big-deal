@@ -240,10 +240,10 @@ public class FirebaseUtils {
                 List<SampleObject> data = new ArrayList<>();
                 for (int i = 0; i < jsonObject.getJSONArray("time").length(); i++) {
                     data.add(new SampleObject(
-                            jsonObject.getJSONArray("time").get(i).toString(),
-                            jsonObject.getJSONArray("total_distance").get(i).toString(),
-                            jsonObject.getJSONArray("velocity").get(i).toString(),
-                            jsonObject.getJSONArray("acceleration").get(i).toString()
+                            Utils.round(jsonObject.getJSONArray("time").getDouble(i), 3),
+                            Utils.round(jsonObject.getJSONArray("total_distance").getDouble(i), 3),
+                            Utils.round(jsonObject.getJSONArray("velocity").getDouble(i), 3),
+                            Utils.round(jsonObject.getJSONArray("acceleration").getDouble(i), 3)
                     ));
                 }
                 TableMainLayout table = activity.findViewById(R.id.tableLayout);

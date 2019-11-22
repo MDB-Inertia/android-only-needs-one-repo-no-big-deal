@@ -1,8 +1,5 @@
 package com.inertia.phyzmo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -16,6 +13,8 @@ import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import java.util.List;
 
 public class TableMainLayout extends RelativeLayout {
 
@@ -71,6 +70,10 @@ public class TableMainLayout extends RelativeLayout {
         this.addComponentToMainLayout();
         this.setBackgroundColor(Color.TRANSPARENT);
 
+        this.horizontalScrollViewB.setOverScrollMode(OVER_SCROLL_NEVER);
+        this.horizontalScrollViewD.setOverScrollMode(OVER_SCROLL_NEVER);
+        this.scrollViewC.setOverScrollMode(OVER_SCROLL_NEVER);
+        this.scrollViewD.setOverScrollMode(OVER_SCROLL_NEVER);
     }
 
     public void setData(List<SampleObject> data) {
