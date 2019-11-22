@@ -2,10 +2,10 @@ package com.inertia.phyzmo;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Display;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -13,17 +13,10 @@ import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 
-import com.anychart.AnyChart;
-import com.anychart.AnyChartView;
-import com.anychart.chart.common.dataentry.DataEntry;
-import com.anychart.chart.common.dataentry.ValueDataEntry;
-import com.anychart.charts.Cartesian;
-import com.anychart.core.cartesian.series.Line;
-import com.anychart.data.Mapping;
-import com.anychart.data.Set;
-import com.anychart.enums.Anchor;
-import com.anychart.enums.MarkerType;
-import com.github.rtoshiro.view.video.FullscreenVideoLayout;
+import com.androidplot.xy.LineAndPointFormatter;
+import com.androidplot.xy.SimpleXYSeries;
+import com.androidplot.xy.XYPlot;
+import com.androidplot.xy.XYSeries;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -50,8 +43,6 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -221,8 +212,6 @@ public class FirebaseUtils {
         protected void onPostExecute(String result) {
             System.out.println(result);
 
-            final AnyChartView acv = activity.findViewById(R.id.chartDisplay);
-            acv.setVisibility(View.VISIBLE);
             activity.findViewById(R.id.statusText).setVisibility(View.INVISIBLE);
 
             try {
@@ -231,7 +220,9 @@ public class FirebaseUtils {
                 e.printStackTrace();
             }
 
-            setChart(acv, "Total Distance");
+            XYPlot plot = activity.findViewById(R.id.chartDisplay);
+            setChart(plot, "Total Distance");
+            plot.setVisibility(View.VISIBLE);
 
             try {
                 List<SampleObject> data = new ArrayList<>();
@@ -266,59 +257,37 @@ public class FirebaseUtils {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view,
                                            int position, long id) {
-                    setChart(acv, staticAdapter.getItem(position).toString());
+                    setChart(plot, staticAdapter.getItem(position).toString());
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
-                    // TODO Auto-generated method stub
                 }
             });
+
+            activity.findViewById(R.id.displayVideo).setEnabled(true);
+            activity.findViewById(R.id.displayChart).setEnabled(true);
+            activity.findViewById(R.id.displayObjectChooser).setEnabled(true);
         }
     }
 
-    static private void setChart(AnyChartView chart, String mode) {
-        DecimalFormat df = new DecimalFormat("#.####");
-        df.setRoundingMode(RoundingMode.CEILING);
-        List<DataEntry> seriesData = new ArrayList<>();
-        Cartesian cartesian = AnyChart.line();
+    static private void setChart(XYPlot chart, String mode) {
         String parsedMode = mode.toLowerCase().replace(" ", "_");
         System.out.println("Parse Mode: " + parsedMode);
+        chart.clear();
+        chart.setTitle(mode + " vs. Time");
+        chart.setRangeLabel(mode);
         try {
             JSONArray timeArray = jsonObject.getJSONArray("time");
-            JSONArray normalizedVelocity = jsonObject.getJSONArray(parsedMode);
-            ArrayList<Double> roundedNormalizedVel = new ArrayList<Double>();
-            for (int j = 0; j < normalizedVelocity.length(); j++) {
-                Double d = Double.valueOf(df.format(normalizedVelocity.getDouble(j)));
-                roundedNormalizedVel.add(d);
-            }
-            for (int i = 0; i < timeArray.length(); i++) {
-                seriesData.add(new ValueDataEntry(timeArray.getDouble(i), roundedNormalizedVel.get(i)));
-            }
+            JSONArray dataSet = jsonObject.getJSONArray(parsedMode);
+            XYSeries series1 = new SimpleXYSeries(Utils.jsonArrayToArrayList(timeArray), Utils.jsonArrayToArrayList(dataSet), mode);
+            LineAndPointFormatter series1Format = new LineAndPointFormatter(Color.LTGRAY, Color.BLUE, null, null);
+            series1Format.setLegendIconEnabled(false);
+            chart.addSeries(series1, series1Format);
+            chart.redraw();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        Set set = Set.instantiate();
-        set.data(seriesData);
-        Mapping series1Mapping = set.mapAs("{ x: 'x', value: 'value' }");
-
-        Line series1 = cartesian.line(series1Mapping);
-        series1.name(mode);
-        series1.hovered().markers().enabled(true);
-        series1.hovered().markers()
-                .type(MarkerType.CIRCLE)
-                .size(4d);
-        series1.tooltip()
-                .position("right")
-                .anchor(Anchor.LEFT_CENTER)
-                .offsetX(5d)
-                .offsetY(5d);
-
-        cartesian.title("Time vs. " + mode);
-        cartesian.xAxis(0).title("Time (seconds)");
-        cartesian.yAxis(0).title(mode + "(m / sec)");
-        chart.setChart(cartesian);
     }
 
 }

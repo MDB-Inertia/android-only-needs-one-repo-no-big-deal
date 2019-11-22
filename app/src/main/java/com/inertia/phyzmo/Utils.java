@@ -9,6 +9,11 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
+import org.json.JSONArray;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class Utils {
     public static String getPathFromURI(final Context context, final Uri uri) {
 
@@ -102,5 +107,17 @@ public class Utils {
 
     public static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+    public static ArrayList<Double> jsonArrayToArrayList(JSONArray a) {
+        ArrayList<Double> result = new ArrayList<>();
+        for (int i = 0; i < a.length(); i++) {
+            try {
+                result.add(a.getDouble(i));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
     }
 }

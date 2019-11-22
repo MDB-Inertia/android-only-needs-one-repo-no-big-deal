@@ -27,6 +27,7 @@ public class DisplayDataActivity extends AppCompatActivity {
     private int currentWindow = 0;
     private long playbackPosition = 0;
     private SimpleExoPlayer player;
+    private String videoUrl;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,7 @@ public class DisplayDataActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 System.out.println("Video option chosen");
+                initializePlayer(videoUrl);
                 showVideo.setEnabled(false);
                 showChart.setEnabled(true);
                 showGraph.setEnabled(true);
@@ -59,6 +61,7 @@ public class DisplayDataActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 System.out.println("Chart option chosen");
+                releasePlayer();
                 showVideo.setEnabled(true);
                 showChart.setEnabled(false);
                 showGraph.setEnabled(true);
@@ -73,6 +76,7 @@ public class DisplayDataActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 System.out.println("Graph option chosen");
+                releasePlayer();
                 showVideo.setEnabled(true);
                 showChart.setEnabled(true);
                 showGraph.setEnabled(false);
@@ -121,6 +125,7 @@ public class DisplayDataActivity extends AppCompatActivity {
     }
 
     public void initializePlayer(String videoUrl) {
+        this.videoUrl = videoUrl;
         player = ExoPlayerFactory.newSimpleInstance(this);
         playerView.setPlayer(player);
 
