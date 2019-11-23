@@ -3,4 +3,9 @@
     <color name="colorPrimary">#000000</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="phyzmoBlue">#0281ed</color>
+    <color name="phyzmoOrange">#e34e30</color>
+    <color name="phyzmoPink">#d513b7</color>
+    <color name="phyzmoPurple">#8b45eb</color>
+    <color name="phyzmoLightBlue">#6fcbeb</color>
 </resources>

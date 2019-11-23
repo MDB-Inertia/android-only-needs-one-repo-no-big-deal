@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/loginLayout"
+    android:id="@+id/signUpLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/login_gradient"
@@ -11,33 +11,33 @@
     android:focusableInTouchMode="true" >
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
+        android:id="@+id/guideline3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.28" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
+        android:id="@+id/guideline4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.72" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/signUpLogo"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="72dp"
         android:rotation="0"
         app:layout_constraintDimensionRatio="w,1:1"
-        app:layout_constraintEnd_toStartOf="@id/guideline2"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintEnd_toStartOf="@id/guideline4"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/phyzmo_logo_2" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/signUpTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -45,13 +45,33 @@
         android:text="phyzmo"
         android:textAppearance="@style/TextAppearance.AppCompat.Display3"
         android:textColor="@color/ap_white"
-        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintEnd_toStartOf="@+id/guideline4"
         app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toBottomOf="@+id/signUpLogo" />
 
     <EditText
-        android:id="@+id/loginEmailInput"
+        android:id="@+id/signUpNameInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="32dp"
+        android:backgroundTint="@color/ap_white"
+        android:ems="10"
+        android:hint="Full Name"
+        android:inputType="textEmailAddress"
+        android:textColor="@color/ap_white"
+        android:textColorHighlight="#B9F1D7D7"
+        android:textColorHint="@color/ap_white"
+        android:textColorLink="@color/ap_white"
+        android:textCursorDrawable="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/signUpTitle" />
+
+    <EditText
+        android:id="@+id/signUpEmailInput"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -68,10 +88,10 @@
         android:textCursorDrawable="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/signUpNameInput" />
 
     <EditText
-        android:id="@+id/loginPasswordInput"
+        android:id="@+id/signUpPasswordInput"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
@@ -84,12 +104,12 @@
         android:textColorHint="@color/ap_white"
         android:textColorLink="@color/ap_white"
         android:textCursorDrawable="@null"
-        app:layout_constraintEnd_toEndOf="@+id/loginEmailInput"
-        app:layout_constraintStart_toStartOf="@+id/loginEmailInput"
-        app:layout_constraintTop_toBottomOf="@+id/loginEmailInput" />
+        app:layout_constraintEnd_toEndOf="@+id/signUpEmailInput"
+        app:layout_constraintStart_toStartOf="@+id/signUpEmailInput"
+        app:layout_constraintTop_toBottomOf="@+id/signUpEmailInput" />
 
     <Button
-        android:id="@+id/loginButton"
+        android:id="@+id/signUpButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -99,22 +119,22 @@
         android:backgroundTint="#FFFFFF"
         android:minHeight="40dip"
         android:padding="10dp"
-        android:text="@string/common_signin_button_text"
+        android:text="SIGN UP"
         android:textColor="@color/phyzmoPurple"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/loginPasswordInput"
-        app:layout_constraintStart_toStartOf="@+id/loginPasswordInput"
-        app:layout_constraintTop_toBottomOf="@+id/loginPasswordInput" />
+        app:layout_constraintEnd_toEndOf="@+id/signUpPasswordInput"
+        app:layout_constraintStart_toStartOf="@+id/signUpPasswordInput"
+        app:layout_constraintTop_toBottomOf="@+id/signUpPasswordInput" />
 
     <TextView
-        android:id="@+id/toggleSignUp"
+        android:id="@+id/toggleSignIn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Don't have an account? SIGN UP"
+        android:text="Already have an account? SIGN IN"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@color/ap_white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginButton" />
+        app:layout_constraintTop_toBottomOf="@+id/signUpButton" />
 </androidx.constraintlayout.widget.ConstraintLayout>

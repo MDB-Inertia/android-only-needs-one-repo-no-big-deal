@@ -47,7 +47,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class FirebaseUtils {
@@ -98,6 +100,17 @@ public class FirebaseUtils {
     public static void trackObjects(Activity a, String uri) {
         new TrackObjectsRequest(a, uri).execute("https://us-central1-phyzmo.cloudfunctions.net/position-cv-all-saver?uri=gs://phyzmo.appspot.com/" + uri);
 
+    }
+
+    public static void addUser(String emailAddress, String name) {
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference users = db.getReference("Users");
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        Map<String, Object> update = new HashMap<>();
+        update.put("email", emailAddress);
+        update.put("fullname", name);
+        update.put("videoId", new ArrayList<>());
+        users.child(userId).updateChildren(update);
     }
 
     static class RequestTask extends AsyncTask<String, String, String> {

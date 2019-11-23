@@ -51,20 +51,9 @@ public class GalleryActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() == null) {
-            mAuth.signInWithEmailAndPassword("b@b.com", "password123")
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                System.out.println("signInWithEmail:success");
-                                FirebaseUser user = mAuth.getCurrentUser();
-                            } else {
-                                System.out.println("signInWithEmail:failure" + task.getException());
-                                Toast.makeText(GalleryActivity.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
         } else {
             System.out.println("Already logged in.");
             FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -102,6 +91,17 @@ public class GalleryActivity extends AppCompatActivity {
                     startActivityForResult(takeVideoIntent,
                             CAMERA_REQUEST_CODE_VIDEO);
                 }
+            }
+        });
+
+        Button logout = findViewById(R.id.logoutButton);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAuth.signOut();
+                Intent intent = new Intent(GalleryActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
     }

@@ -12,6 +12,8 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -243,5 +245,10 @@ public class Utils {
         if (!permsToRequest.isEmpty()) {
             ActivityCompat.requestPermissions(activity, permsToRequest.toArray(array), 89);
         }
+    }
+
+    public static void hideKeyboard(Activity activity, View view) {
+        InputMethodManager inputMethodManager = (InputMethodManager)activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }
