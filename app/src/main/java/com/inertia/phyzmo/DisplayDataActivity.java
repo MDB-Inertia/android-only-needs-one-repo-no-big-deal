@@ -2,8 +2,11 @@ package com.inertia.phyzmo;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +28,8 @@ public class DisplayDataActivity extends AppCompatActivity {
 
     TextView statusLine;
 
+    EditText distanceInput;
+
     Button showVideo;
     Button showChart;
     Button showGraph;
@@ -43,12 +48,18 @@ public class DisplayDataActivity extends AppCompatActivity {
     private SimpleExoPlayer player;
     private String videoUrl;
 
+    ObjectSelectionAdapter adapter;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graphs);
 
         statusLine = findViewById(R.id.statusText);
+
+        distanceInput = findViewById(R.id.distanceInput);
+
+        ((CustomImageView) findViewById(R.id.distanceCanvas)).activity = this;
 
         showVideo = findViewById(R.id.displayVideo);
         showChart = findViewById(R.id.displayChart);
@@ -84,6 +95,8 @@ public class DisplayDataActivity extends AppCompatActivity {
                 findViewById(R.id.tableLayout).setVisibility(View.INVISIBLE);
                 findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
                 saveObjectSettings.setVisibility(View.INVISIBLE);
+                findViewById(R.id.distanceObjectSwitch).setVisibility(View.INVISIBLE);
+                findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
             }
         });
 
@@ -102,6 +115,8 @@ public class DisplayDataActivity extends AppCompatActivity {
                 findViewById(R.id.tableLayout).setVisibility(View.VISIBLE);
                 findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
                 saveObjectSettings.setVisibility(View.INVISIBLE);
+                findViewById(R.id.distanceObjectSwitch).setVisibility(View.INVISIBLE);
+                findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
             }
         });
 
@@ -120,6 +135,8 @@ public class DisplayDataActivity extends AppCompatActivity {
                 findViewById(R.id.tableLayout).setVisibility(View.INVISIBLE);
                 findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
                 saveObjectSettings.setVisibility(View.INVISIBLE);
+                findViewById(R.id.distanceObjectSwitch).setVisibility(View.INVISIBLE);
+                findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
             }
         });
 
@@ -138,15 +155,61 @@ public class DisplayDataActivity extends AppCompatActivity {
                 findViewById(R.id.tableLayout).setVisibility(View.INVISIBLE);
                 findViewById(R.id.objectSelectionView).setVisibility(View.VISIBLE);
                 saveObjectSettings.setVisibility(View.VISIBLE);
+                findViewById(R.id.distanceObjectSwitch).setVisibility(View.VISIBLE);
+                findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
+                findViewById(R.id.switchToObjects).setEnabled(false);
+                findViewById(R.id.switchToDistance).setEnabled(true);
+                findViewById(R.id.distanceInput).setEnabled(false);
+            }
+        });
+
+        findViewById(R.id.switchToObjects).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findViewById(R.id.switchToObjects).setEnabled(false);
+                findViewById(R.id.switchToDistance).setEnabled(true);
+                findViewById(R.id.objectSelectionView).setVisibility(View.VISIBLE);
+                findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
+                findViewById(R.id.distanceInput).setEnabled(false);
+                //saveObjectSettings.setVisibility(View.VISIBLE);
+            }
+        });
+
+        findViewById(R.id.switchToDistance).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findViewById(R.id.switchToObjects).setEnabled(true);
+                findViewById(R.id.switchToDistance).setEnabled(false);
+                findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
+                findViewById(R.id.distanceCanvas).setVisibility(View.VISIBLE);
+                findViewById(R.id.distanceInput).setEnabled(true);
+                //saveObjectSettings.setVisibility(View.INVISIBLE);
             }
         });
 
         objectSelectionView = findViewById(R.id.objectSelectionView);
         ArrayList<ObjectChoiceModel> data = new ArrayList<>();
         objectSelectionView.setLayoutManager(new LinearLayoutManager(this));
-        ObjectSelectionAdapter adapter = new ObjectSelectionAdapter(getApplicationContext(), data, this);
+        adapter = new ObjectSelectionAdapter(getApplicationContext(), data, this);
         adapter.notifyDataSetChanged();
         objectSelectionView.setAdapter(adapter);
+
+        distanceInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                adapter.updateSelectButton();
+            }
+        });
 
 
         System.out.println(getIntent().getExtras().getString("video_url"));

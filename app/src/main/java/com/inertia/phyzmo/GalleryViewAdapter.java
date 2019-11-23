@@ -46,8 +46,10 @@ public class GalleryViewAdapter extends RecyclerView.Adapter<GalleryViewAdapter.
 
         Glide.with(holder.thumbnail.getContext())
                 .load("https://storage.googleapis.com/phyzmo.appspot.com/" + mData.get(position) + ".jpg")
-                .override((int) (size.x / 5), (int) (size.x / 4))
                 .centerCrop()
+                .placeholder(R.drawable.gray_square)
+                .override((int) (size.x / 5), (int) (size.x / 4))
+                .dontAnimate()
                 .into(holder.thumbnail);
 
         holder.thumbnail.setOnClickListener(new View.OnClickListener() {

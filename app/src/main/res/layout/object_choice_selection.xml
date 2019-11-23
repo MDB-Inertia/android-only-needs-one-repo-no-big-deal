@@ -8,12 +8,18 @@
 
     <TextView
         android:id="@+id/objectName"
-        android:layout_width="wrap_content"
+        android:layout_width="0dip"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
+        android:layout_marginEnd="36dp"
+        android:ellipsize="none"
+        android:maxLines="1000"
+        android:scrollHorizontally="false"
+        android:singleLine="false"
         android:text="Example of Object"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintBottom_toBottomOf="@+id/objectEnabledCheckbox"
+        app:layout_constraintEnd_toStartOf="@+id/objectEnabledCheckbox"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/objectEnabledCheckbox" />
 

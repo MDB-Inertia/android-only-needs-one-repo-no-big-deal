@@ -1,11 +1,11 @@
 package com.inertia.phyzmo;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -154,11 +154,24 @@ public class ObjectSelectionAdapter extends RecyclerView.Adapter<ObjectSelection
 
     public void updateSelectButton() {
         Button saveObjects = mActivity.findViewById(R.id.saveObjectsChosen);
+        EditText distanceInput = mActivity.findViewById(R.id.distanceInput);
+        CustomImageView imageCanvas = mActivity.findViewById(R.id.distanceCanvas);
+
         saveObjects.setEnabled(false);
+        boolean oneItemSelected = false;
         for (ObjectChoiceModel object: mData) {
             if (object.isEnabled()) {
-                saveObjects.setEnabled(true);
+                oneItemSelected = true;
             }
         }
+        boolean distanceInputted = false;
+        try {
+            if (Double.valueOf(distanceInput.getText().toString()) > 0) {
+                distanceInputted = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        saveObjects.setEnabled(oneItemSelected && distanceInputted && imageCanvas.hasValidLine());
     }
 }

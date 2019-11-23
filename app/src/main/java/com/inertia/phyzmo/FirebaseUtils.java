@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.androidplot.xy.XYPlot;
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -44,6 +46,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,6 +61,8 @@ public class FirebaseUtils {
 
         Uri file = Uri.fromFile(new File(videoPath));
         final StorageReference riversRef = storageRef.child(UUID.randomUUID().toString() + ".mp4");
+
+        System.out.println("Uploading file...");
 
         riversRef.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -170,26 +175,41 @@ public class FirebaseUtils {
                     loadingImage.setVisibility(View.VISIBLE);
                     activity.findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
                     activity.findViewById(R.id.saveObjectsChosen).setVisibility(View.INVISIBLE);
+                    activity.findViewById(R.id.distanceObjectSwitch).setVisibility(View.INVISIBLE);
+                    activity.findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
                     TextView t = activity.findViewById(R.id.statusText);
                     t.setText("Analyzing Objects");
-                    String selectedList = objectSelectionAdapter.buildSelectedItemString().replace(" ", "%20");
-                    String executedURL = "https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + name.replace(".mp4", ".json") + "&obj_descriptions=[" + selectedList + "]&ref_list=[[0.121,0.215],[0.9645,0.446],0.60]";
-                    System.out.println(executedURL);
-                    new FirebaseUtils.DataComputationRequest(activity, name, objectSelectionAdapter.getSelectedItems()).execute(executedURL);
+
+                    CustomImageView distanceCanvas = activity.findViewById(R.id.distanceCanvas);
+                    EditText distanceInput = activity.findViewById(R.id.distanceInput);
 
                     ArrayList<ArrayList<Double>> positions = new ArrayList<>();
                     ArrayList<Double> firstPoint = new ArrayList<>();
                     ArrayList<Double> secondPoint = new ArrayList<>();
-                    firstPoint.add(0.121);
-                    firstPoint.add(0.215);
-                    secondPoint.add(0.9645);
-                    secondPoint.add(0.446);
+                    firstPoint.add(Double.valueOf(distanceCanvas.firstPoint.x / distanceCanvas.getWidth()));
+                    firstPoint.add(Double.valueOf(distanceCanvas.firstPoint.y / distanceCanvas.getHeight()));
+                    secondPoint.add(Double.valueOf(distanceCanvas.secondPoint.x / distanceCanvas.getWidth()));
+                    secondPoint.add(Double.valueOf(distanceCanvas.secondPoint.y / distanceCanvas.getHeight()));
                     positions.add(firstPoint);
                     positions.add(secondPoint);
-                    double units = 0.60;
+                    double units = Double.valueOf(distanceInput.getText().toString());
+
+                    String selectedList = objectSelectionAdapter.buildSelectedItemString().replace(" ", "%20");
+                    //String executedURL = "https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + name.replace(".mp4", ".json") + "&obj_descriptions=[" + selectedList + "]&ref_list=[[0.121,0.215],[0.9645,0.446],0.60]";
+                    String executedURL = "https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + name.replace(".mp4", ".json") + "&obj_descriptions=[" + selectedList + "]&ref_list=[[" + firstPoint.get(0) + "," + firstPoint.get(1) + "],[" + secondPoint.get(0) + "," + secondPoint.get(1) + "]," + units + "]";
+                    System.out.println(executedURL);
+                    new FirebaseUtils.DataComputationRequest(activity, name, objectSelectionAdapter.getSelectedItems(), firstPoint, secondPoint, String.valueOf(units)).execute(executedURL);
+
                     FirebaseUtils.updateVideoDetails(name.replace(".mp4", ""), objectSelectionAdapter.getSelectedItems(), positions, units);
                 }
             });
+
+            Glide.with(activity.getApplicationContext())
+                    .load("https://storage.googleapis.com/phyzmo.appspot.com/" + name.replace(".mp4", "") + ".jpg")
+                    .placeholder(R.drawable.gray_square)
+                    .dontAnimate()
+                    .into((ImageView) activity.findViewById(R.id.distanceCanvas));
+            activity.findViewById(R.id.distanceCanvas).setVisibility(View.VISIBLE);
 
             System.out.println(result);
             activity.findViewById(R.id.statusText).setVisibility(View.INVISIBLE);
@@ -213,11 +233,17 @@ public class FirebaseUtils {
         private Activity activity;
         private String fileName;
         private ArrayList<String> preEnabledObjects;
+        private ArrayList<Double> point1;
+        private ArrayList<Double> point2;
+        private String unit;
 
-        public DataComputationRequest(Activity a, String filename, ArrayList<String> preEnabledObjects) {
+        public DataComputationRequest(Activity a, String filename, ArrayList<String> preEnabledObjects, ArrayList<Double> p1, ArrayList<Double> p2, String unit) {
             this.activity = a;
             this.fileName = filename;
             this.preEnabledObjects = preEnabledObjects;
+            this.point1 = p1;
+            this.point2 = p2;
+            this.unit = unit;
         }
 
         @Override
@@ -257,6 +283,12 @@ public class FirebaseUtils {
 
             ((DisplayDataActivity)(activity)).initializePlayer("https://storage.googleapis.com/phyzmo.appspot.com/" + fileName);
 
+            Glide.with(activity.getApplicationContext())
+                    .load("https://storage.googleapis.com/phyzmo.appspot.com/" + fileName.replace(".mp4", "") + ".jpg")
+                    .placeholder(R.drawable.gray_square)
+                    .dontAnimate()
+                    .into((ImageView) activity.findViewById(R.id.distanceCanvas));
+
             final Spinner staticSpinner = activity.findViewById(R.id.chooseGraph);
             staticSpinner.setVisibility(View.VISIBLE);
 
@@ -264,8 +296,7 @@ public class FirebaseUtils {
                     .createFromResource(activity, R.array.graph_choices,
                             android.R.layout.simple_spinner_item);
 
-            staticAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
+            staticAdapter.setDropDownViewResource(R.layout.spinner_layout);
             staticSpinner.setAdapter(staticAdapter);
 
             String jsonCopy = jsonObject.toString();
@@ -288,6 +319,14 @@ public class FirebaseUtils {
                 public void onNothingSelected(AdapterView<?> parent) {
                 }
             });
+
+            ((EditText) activity.findViewById(R.id.distanceInput)).setText(unit);
+            CustomImageView distanceCanvas = activity.findViewById(R.id.distanceCanvas);
+            System.out.println(point1.get(0) + ", " + point1.get(1));
+            System.out.println(point2.get(0) + ", " + point2.get(1));
+            distanceCanvas.firstPoint = new CustomImageView.Point(point1.get(0).floatValue() * distanceCanvas.getWidth(), point1.get(1).floatValue() * distanceCanvas.getHeight());
+            distanceCanvas.secondPoint = new CustomImageView.Point(point2.get(0).floatValue() * distanceCanvas.getWidth(), point2.get(1).floatValue() * distanceCanvas.getHeight());
+            distanceCanvas.invalidate();
 
             activity.findViewById(R.id.displayVideo).setEnabled(true);
             activity.findViewById(R.id.displayChart).setEnabled(true);
@@ -341,10 +380,22 @@ public class FirebaseUtils {
                     for (DataSnapshot d: dataSnapshot.child("objects_selected").getChildren()) {
                         selectedObjects.add(d.getValue().toString());
                     }
+                    DataSnapshot line = dataSnapshot.child("line");
+                    String point1X = line.child("0").child("0").getValue().toString();
+                    String point1Y = line.child("0").child("1").getValue().toString();
+                    String point2X = line.child("1").child("0").getValue().toString();
+                    String point2Y = line.child("1").child("1").getValue().toString();
+                    ArrayList<Double> point1 = new ArrayList<>();
+                    ArrayList<Double> point2 = new ArrayList<>();
+                    point1.add(Double.valueOf(point1X));
+                    point1.add(Double.valueOf(point1Y));
+                    point2.add(Double.valueOf(point2X));
+                    point2.add(Double.valueOf(point2Y));
+                    String unit = dataSnapshot.child("unit").getValue().toString();
                     String selectedList = Utils.buildStringFromArray(selectedObjects).replace(" ", "%20");
-                    String executedURL = "https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + id + ".json&obj_descriptions=[" + selectedList + "]&ref_list=[[0.121,0.215],[0.9645,0.446],0.60]";
+                    String executedURL = "https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + id + ".json&obj_descriptions=[" + selectedList + "]&ref_list=[[" + point1X +  "," + point1Y + "],[" + point2X + "," + point2Y + "]," + unit + "]";
                     System.out.println(executedURL);
-                    new FirebaseUtils.DataComputationRequest(a, id+".mp4", selectedObjects).execute(executedURL);
+                    new FirebaseUtils.DataComputationRequest(a, id+".mp4", selectedObjects, point1, point2, unit).execute(executedURL);
                 } else {
                     System.err.println("Video does not exit in Videos list in Firebase.");
                     FirebaseUtils.trackObjects(a, id + ".mp4");
@@ -371,6 +422,9 @@ public class FirebaseUtils {
 
         @Override
         protected void onPostExecute(String result) {
+
+            System.out.println("Population Video ID: " + videoId);
+
             activity.findViewById(R.id.statusText).setVisibility(View.INVISIBLE);
 
             System.out.println("Populate Possibilities Result: " + result);
@@ -392,6 +446,9 @@ public class FirebaseUtils {
                 objectChoiceModels.add(new ObjectChoiceModel(Utils.capitalizeTitle(keyList.get(i)), preEnabledObjects.contains(keyList.get(i))));
             }
 
+            CustomImageView distanceCanvas = activity.findViewById(R.id.distanceCanvas);
+            EditText distanceInput = activity.findViewById(R.id.distanceInput);
+
             ObjectSelectionAdapter objectSelectionAdapter = (ObjectSelectionAdapter)objectSelectionView.getAdapter();
             objectSelectionAdapter.setData(objectChoiceModels);
             Button saveObjects = activity.findViewById(R.id.saveObjectsChosen);
@@ -402,25 +459,29 @@ public class FirebaseUtils {
                     activity.findViewById(R.id.statusText).setVisibility(View.VISIBLE);
                     activity.findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
                     activity.findViewById(R.id.saveObjectsChosen).setVisibility(View.INVISIBLE);
+                    activity.findViewById(R.id.distanceObjectSwitch).setVisibility(View.INVISIBLE);
+                    activity.findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
                     TextView t = activity.findViewById(R.id.statusText);
                     t.setText("Analyzing Objects");
-                    ImageView loadingImage = activity.findViewById(R.id.loadingGif);
-                    loadingImage.setVisibility(View.VISIBLE);
-                    String selectedList = objectSelectionAdapter.buildSelectedItemString().replace(" ", "%20");
-                    String executedURL = "https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + videoId + ".json" + "&obj_descriptions=[" + selectedList + "]&ref_list=[[0.121,0.215],[0.9645,0.446],0.60]";
-                    System.out.println(executedURL);
-                    new FirebaseUtils.DataComputationRequest(activity, videoId + ".mp4", objectSelectionAdapter.getSelectedItems()).execute(executedURL);
 
                     ArrayList<ArrayList<Double>> positions = new ArrayList<>();
                     ArrayList<Double> firstPoint = new ArrayList<>();
                     ArrayList<Double> secondPoint = new ArrayList<>();
-                    firstPoint.add(0.121);
-                    firstPoint.add(0.215);
-                    secondPoint.add(0.9645);
-                    secondPoint.add(0.446);
+                    firstPoint.add(Double.valueOf(distanceCanvas.firstPoint.x / distanceCanvas.getWidth()));
+                    firstPoint.add(Double.valueOf(distanceCanvas.firstPoint.y / distanceCanvas.getHeight()));
+                    secondPoint.add(Double.valueOf(distanceCanvas.secondPoint.x / distanceCanvas.getWidth()));
+                    secondPoint.add(Double.valueOf(distanceCanvas.secondPoint.y / distanceCanvas.getHeight()));
                     positions.add(firstPoint);
                     positions.add(secondPoint);
-                    double units = 0.60;
+                    double units = Double.valueOf(distanceInput.getText().toString());
+
+                    ImageView loadingImage = activity.findViewById(R.id.loadingGif);
+                    loadingImage.setVisibility(View.VISIBLE);
+                    String selectedList = objectSelectionAdapter.buildSelectedItemString().replace(" ", "%20");
+                    String executedURL = "https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/" + videoId + ".json" + "&obj_descriptions=[" + selectedList + "]&ref_list=[[" + firstPoint.get(0) + "," + firstPoint.get(1) + "],[" + secondPoint.get(0) + "," + secondPoint.get(1) + "]," + units + "]";
+                    System.out.println("Populating URL: " + executedURL);
+                    new FirebaseUtils.DataComputationRequest(activity, videoId + ".mp4", objectSelectionAdapter.getSelectedItems(), firstPoint, secondPoint, String.valueOf(units)).execute(executedURL);
+
                     FirebaseUtils.updateVideoDetails(videoId, objectSelectionAdapter.getSelectedItems(), positions, units);
                 }
             });

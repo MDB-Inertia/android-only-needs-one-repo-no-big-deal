@@ -76,6 +76,7 @@ public class GalleryActivity extends AppCompatActivity {
                                 videoIds.add(d.getValue().toString());
                             }
                             adapter.setData(videoIds);
+                            findViewById(R.id.loadingGifMainScreen).setVisibility(View.INVISIBLE);
                         }
 
                         @Override
@@ -112,5 +113,31 @@ public class GalleryActivity extends AppCompatActivity {
                 FirebaseUtils.uploadFile(this, path);
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        RecyclerView recyclerView = findViewById(R.id.galleryView);
+        GalleryViewAdapter adapter = (GalleryViewAdapter) recyclerView.getAdapter();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference userRef = database.getReference("Users");
+        Query specific_user = userRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        specific_user.addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        ArrayList<String> videoIds = new ArrayList<>();
+                        for (DataSnapshot d: dataSnapshot.child("videoId").getChildren()) {
+                            videoIds.add(d.getValue().toString());
+                        }
+                        adapter.setData(videoIds);
+                        findViewById(R.id.loadingGifMainScreen).setVisibility(View.INVISIBLE);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
     }
 }

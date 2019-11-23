@@ -161,6 +161,9 @@ public class Utils {
 
     public static void setChart(XYPlot chart, String mode, JSONObject jsonObject) {
         String parsedMode = mode.toLowerCase().replace(" ", "_");
+        if (parsedMode.equals("normalized_acceleration")) {
+            parsedMode = "normalized_acce";
+        }
         System.out.println("Parse Mode: " + parsedMode);
         chart.clear();
         chart.setTitle(mode + " vs. Time");
@@ -184,7 +187,7 @@ public class Utils {
 
         for (int i = 0; i < data.size(); ++i) {
             if (foundOne) {
-                sb.append(", ");
+                sb.append(",");
             }
             foundOne = true;
             sb.append("'" + escapeStringUrl(data.get(i).toLowerCase()) + "'");

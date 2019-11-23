@@ -7,6 +7,62 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <com.inertia.phyzmo.CustomImageView
+        android:id="@+id/distanceCanvas"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/saveObjectsChosen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/distanceObjectSwitch"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <LinearLayout
+        android:id="@+id/distanceObjectSwitch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="#CCCCCC"
+        android:orientation="horizontal"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/actionBar">
+
+        <Button
+            android:id="@+id/switchToObjects"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Objects" />
+
+        <Button
+            android:id="@+id/switchToDistance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Distance" />
+
+        <EditText
+            android:id="@+id/distanceInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="5"
+            android:hint="Distance (m)"
+            android:inputType="none|numberDecimal"
+            android:textAlignment="center"
+            android:textColorHighlight="#03A9F4"
+            android:textColorLink="#FFFFFF" />
+    </LinearLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/actionBar"
         android:layout_width="0dp"
@@ -84,6 +140,12 @@
         android:id="@+id/chooseGraph"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:dropDownWidth="match_parent"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        android:spinnerMode="dropdown"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -164,7 +226,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:text="Select"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/chartDisplay"
@@ -187,12 +249,13 @@
         android:id="@+id/objectSelectionView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:visibility="invisible"
+        android:layout_marginTop="4dp"
         android:overScrollMode="never"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@id/saveObjectsChosen"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/actionBar" />
+        app:layout_constraintTop_toBottomOf="@id/distanceObjectSwitch" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
