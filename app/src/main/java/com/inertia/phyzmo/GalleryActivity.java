@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -43,6 +44,8 @@ public class GalleryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Utils.checkPermissions(this);
 
         final GalleryViewAdapter adapter = new GalleryViewAdapter(this, new ArrayList<>());
 
@@ -118,26 +121,45 @@ public class GalleryActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        RecyclerView recyclerView = findViewById(R.id.galleryView);
-        GalleryViewAdapter adapter = (GalleryViewAdapter) recyclerView.getAdapter();
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference userRef = database.getReference("Users");
-        Query specific_user = userRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        specific_user.addListenerForSingleValueEvent(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        ArrayList<String> videoIds = new ArrayList<>();
-                        for (DataSnapshot d: dataSnapshot.child("videoId").getChildren()) {
-                            videoIds.add(d.getValue().toString());
+        if (mAuth.getCurrentUser() != null) {
+            RecyclerView recyclerView = findViewById(R.id.galleryView);
+            GalleryViewAdapter adapter = (GalleryViewAdapter) recyclerView.getAdapter();
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference userRef = database.getReference("Users");
+            Query specific_user = userRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            specific_user.addListenerForSingleValueEvent(
+                    new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            ArrayList<String> videoIds = new ArrayList<>();
+                            for (DataSnapshot d : dataSnapshot.child("videoId").getChildren()) {
+                                videoIds.add(d.getValue().toString());
+                            }
+                            adapter.setData(videoIds);
+                            findViewById(R.id.loadingGifMainScreen).setVisibility(View.INVISIBLE);
                         }
-                        adapter.setData(videoIds);
-                        findViewById(R.id.loadingGifMainScreen).setVisibility(View.INVISIBLE);
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 89: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    System.out.println("PERMISSION GRANTED!");
+                } else {
+
+                }
+                return;
+            }
+        }
     }
 }

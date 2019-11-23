@@ -1,7 +1,10 @@
 package com.inertia.phyzmo;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -9,6 +12,10 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
 
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
@@ -25,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static androidx.core.content.PermissionChecker.checkSelfPermission;
 
 public class Utils {
     public static String getPathFromURI(final Context context, final Uri uri) {
@@ -207,5 +216,32 @@ public class Utils {
         BigDecimal bd = new BigDecimal(Double.toString(value));
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.toString();
+    }
+
+    public static void checkPermissions(Activity activity) {
+
+        ArrayList<String> permsToRequest = new ArrayList<>();
+
+        if(ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            //String[] permissionRequested={Manifest.permission.CAMERA};
+            permsToRequest.add(Manifest.permission.CAMERA);
+            //ActivityCompat.requestPermissions(activity, permissionRequested, 101);
+        }
+
+        if(ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            //String[] permissionRequested={Manifest.permission.READ_EXTERNAL_STORAGE};
+            //ActivityCompat.requestPermissions(activity, permissionRequested, 101);
+            permsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+
+        if(ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            //String[] permissionRequested={Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            //ActivityCompat.requestPermissions(activity, permissionRequested, 101);
+            permsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        String[] array = {};
+        if (!permsToRequest.isEmpty()) {
+            ActivityCompat.requestPermissions(activity, permsToRequest.toArray(array), 89);
+        }
     }
 }
