@@ -322,10 +322,15 @@ public class FirebaseUtils {
 
             ((EditText) activity.findViewById(R.id.distanceInput)).setText(unit);
             CustomImageView distanceCanvas = activity.findViewById(R.id.distanceCanvas);
-            System.out.println(point1.get(0) + ", " + point1.get(1));
-            System.out.println(point2.get(0) + ", " + point2.get(1));
-            distanceCanvas.firstPoint = new CustomImageView.Point(point1.get(0).floatValue() * distanceCanvas.getWidth(), point1.get(1).floatValue() * distanceCanvas.getHeight());
-            distanceCanvas.secondPoint = new CustomImageView.Point(point2.get(0).floatValue() * distanceCanvas.getWidth(), point2.get(1).floatValue() * distanceCanvas.getHeight());
+
+            int wrapSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+            distanceCanvas.measure(wrapSpec, wrapSpec);
+
+            System.out.println(point1.get(0).floatValue() * distanceCanvas.getWidth() + ", " + point1.get(1).floatValue() * distanceCanvas.getHeight());
+            System.out.println(point2.get(0).floatValue() * distanceCanvas.getWidth() + ", " + point2.get(1).floatValue() * distanceCanvas.getHeight());
+            System.out.println(distanceCanvas.getMeasuredWidth() + ", " + distanceCanvas.getWidth());
+            distanceCanvas.firstPoint = new CustomImageView.Point(point1.get(0).floatValue() * distanceCanvas.getMeasuredWidth(), point1.get(1).floatValue() * distanceCanvas.getHeight());
+            distanceCanvas.secondPoint = new CustomImageView.Point(point2.get(0).floatValue() * distanceCanvas.getMeasuredWidth(), point2.get(1).floatValue() * distanceCanvas.getHeight());
             distanceCanvas.invalidate();
 
             activity.findViewById(R.id.displayVideo).setEnabled(true);

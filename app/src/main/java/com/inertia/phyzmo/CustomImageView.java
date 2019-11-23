@@ -16,6 +16,9 @@ public class CustomImageView extends AppCompatImageView {
     Point firstPoint;
     Point secondPoint;
 
+    private int w;
+    private int h;
+
     DisplayDataActivity activity;
 
     public CustomImageView(Context context, AttributeSet attrs) {
@@ -28,6 +31,9 @@ public class CustomImageView extends AppCompatImageView {
 
         firstPoint = null;
         secondPoint = null;
+
+        w = getWidth();
+        h = getHeight();
 
         this.setOnTouchListener(new OnTouchListener() {
             @Override
@@ -54,6 +60,22 @@ public class CustomImageView extends AppCompatImageView {
                 return false;
             }
         });
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        this.w = w;
+        this.h = h;
+        super.onSizeChanged(w, h, oldw, oldh);
+    }
+
+
+    public int getCanvasWidth() {
+        return w;
+    }
+
+    public int getCanvasHeight() {
+        return h;
     }
 
     @Override
