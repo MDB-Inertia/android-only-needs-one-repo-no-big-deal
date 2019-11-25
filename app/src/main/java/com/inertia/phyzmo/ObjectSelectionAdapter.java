@@ -170,7 +170,7 @@ public class ObjectSelectionAdapter extends RecyclerView.Adapter<ObjectSelection
                 distanceInputted = true;
             }
         } catch (Exception e) {
-            System.out.println("Tryed to cast an empty string to double");
+            System.out.println("Tried to cast an empty string to double");
         }
         saveObjects.setEnabled(oneItemSelected && distanceInputted && imageCanvas.hasValidLine());
     }

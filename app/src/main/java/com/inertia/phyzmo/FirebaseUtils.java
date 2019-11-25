@@ -15,9 +15,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.androidplot.xy.XYPlot;
+import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -27,6 +29,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -51,6 +54,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class FirebaseUtils {
 
@@ -90,7 +95,10 @@ public class FirebaseUtils {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
-                        // ...
+                        new SweetAlertDialog(a, SweetAlertDialog.ERROR_TYPE)
+                                .setTitleText("Error")
+                                .setContentText("An error occurred while uploading your video! Check your internet connection and try again.")
+                                .show();
                         System.out.println("Video upload failed!");
                         exception.printStackTrace();
                     }
@@ -111,6 +119,57 @@ public class FirebaseUtils {
         update.put("fullname", name);
         update.put("videoId", new ArrayList<>());
         users.child(userId).updateChildren(update);
+    }
+
+    public static void deleteVideosForUser(GalleryActivity a, ArrayList<String> selectedToDelete) {
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference userRef = database.getReference("Users");
+        final DatabaseReference specific_user = userRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        specific_user.addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        ArrayList<String> videoIds = new ArrayList<>();
+                        for (DataSnapshot d: dataSnapshot.child("videoId").getChildren()) {
+                            if (selectedToDelete.contains(d.getValue().toString())) {
+                                videoIds.add(d.getValue().toString());
+                            }
+                        }
+                        specific_user.child("videoId").setValue(videoIds);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+    }
+
+    public static void loadThumbnails(GalleryActivity a, GalleryViewAdapter adapter, PullRefreshLayout layout) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference userRef = database.getReference("Users");
+        Query specific_user = userRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        specific_user.addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        ArrayList<String> videoIds = new ArrayList<>();
+                        for (DataSnapshot d: dataSnapshot.child("videoId").getChildren()) {
+                            videoIds.add(d.getValue().toString());
+                        }
+                        adapter.setData(videoIds);
+                        a.findViewById(R.id.loadingGifMainScreen).setVisibility(View.INVISIBLE);
+                        layout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        new SweetAlertDialog(a, SweetAlertDialog.ERROR_TYPE)
+                                .setTitleText("Error")
+                                .setContentText("An error occurred while gathering your videos! Check your internet connection and try again.")
+                                .show();
+                        layout.setRefreshing(false);
+                    }
+                });
     }
 
     static class RequestTask extends AsyncTask<String, String, String> {
@@ -142,9 +201,17 @@ public class FirebaseUtils {
             } catch (ClientProtocolException e) {
                 //TODO Handle problems..
                 e.printStackTrace();
+                new SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
+                        .setTitleText("Error")
+                        .setContentText("An error occurred while processing your video!")
+                        .show();
             } catch (IOException e) {
                 //TODO Handle problems..
                 e.printStackTrace();
+                new SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
+                        .setTitleText("Error")
+                        .setContentText("An error occurred while processing your video!")
+                        .show();
             }
             return responseString;
         }
@@ -229,7 +296,7 @@ public class FirebaseUtils {
             ImageView loadingImage = activity.findViewById(R.id.loadingGif);
             loadingImage.setVisibility(View.INVISIBLE);
 
-            Button showObjectChooser = activity.findViewById(R.id.displayObjectChooser);
+            ConstraintLayout showObjectChooser = activity.findViewById(R.id.displayObjectChooser);
             showObjectChooser.callOnClick();
 
             activity.findViewById(R.id.displayVideo).setEnabled(false);

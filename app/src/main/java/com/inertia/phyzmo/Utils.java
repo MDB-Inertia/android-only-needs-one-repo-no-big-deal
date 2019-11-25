@@ -251,4 +251,14 @@ public class Utils {
         InputMethodManager inputMethodManager = (InputMethodManager)activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
+
+    public static String getFirstName(String displayName) {
+        if (displayName == null) {
+            return "";
+        }
+        if (displayName.contains(" ")) {
+            return Utils.capitalizeTitle(displayName.substring(0, displayName.indexOf(' ')));
+        }
+        return Utils.capitalizeTitle(displayName);
+    }
 }

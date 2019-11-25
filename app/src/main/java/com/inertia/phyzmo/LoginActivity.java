@@ -50,12 +50,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnFocusChan
 
     @Override
     public void onClick(View v) {
+        v.setEnabled(false);
+
         String emailAddress = emailInput.getText().toString();
         String password = passwordInput.getText().toString();
 
         if (emailAddress.isEmpty() || password.isEmpty()) {
             Toast.makeText(LoginActivity.this, "Authentication failed.",
                     Toast.LENGTH_SHORT).show();
+            v.setEnabled(true);
             return;
         }
 
@@ -72,6 +75,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnFocusChan
                     System.out.println("signInWithEmail:failure" + task.getException());
                     Toast.makeText(LoginActivity.this, "Authentication failed.",
                             Toast.LENGTH_SHORT).show();
+                    v.setEnabled(true);
                 }
             }
         });

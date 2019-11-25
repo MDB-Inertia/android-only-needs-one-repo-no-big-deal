@@ -1,5 +1,6 @@
 package com.inertia.phyzmo;
 
+import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -7,9 +8,12 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,10 +34,10 @@ public class DisplayDataActivity extends AppCompatActivity {
 
     EditText distanceInput;
 
-    Button showVideo;
-    Button showChart;
-    Button showGraph;
-    Button showObjectChooser;
+    ConstraintLayout showVideo;
+    ConstraintLayout showChart;
+    ConstraintLayout showGraph;
+    ConstraintLayout showObjectChooser;
 
     Button saveObjectSettings;
 
@@ -78,17 +82,17 @@ public class DisplayDataActivity extends AppCompatActivity {
 
         playerView = findViewById(R.id.video_view);
 
-        showGraph.setEnabled(false);
+        setGraphButtonEnabled(false);
 
         showVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //System.out.println("Video option chosen");
                 initializePlayer(videoUrl);
-                showVideo.setEnabled(false);
-                showChart.setEnabled(true);
-                showGraph.setEnabled(true);
-                showObjectChooser.setEnabled(true);
+                setVideoButtonEnabled(false);
+                setChartButtonEnabled(true);
+                setGraphButtonEnabled(true);
+                setObjectsButtonEnabled(true);
                 findViewById(R.id.video_view).setVisibility(View.VISIBLE);
                 findViewById(R.id.chartDisplay).setVisibility(View.INVISIBLE);
                 findViewById(R.id.chooseGraph).setVisibility(View.INVISIBLE);
@@ -105,10 +109,10 @@ public class DisplayDataActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //System.out.println("Chart option chosen");
                 releasePlayer();
-                showVideo.setEnabled(true);
-                showChart.setEnabled(false);
-                showGraph.setEnabled(true);
-                showObjectChooser.setEnabled(true);
+                setVideoButtonEnabled(true);
+                setChartButtonEnabled(false);
+                setGraphButtonEnabled(true);
+                setObjectsButtonEnabled(true);
                 findViewById(R.id.video_view).setVisibility(View.INVISIBLE);
                 findViewById(R.id.chartDisplay).setVisibility(View.INVISIBLE);
                 findViewById(R.id.chooseGraph).setVisibility(View.INVISIBLE);
@@ -125,10 +129,10 @@ public class DisplayDataActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //System.out.println("Graph option chosen");
                 releasePlayer();
-                showVideo.setEnabled(true);
-                showChart.setEnabled(true);
-                showGraph.setEnabled(false);
-                showObjectChooser.setEnabled(true);
+                setVideoButtonEnabled(true);
+                setChartButtonEnabled(true);
+                setGraphButtonEnabled(false);
+                setObjectsButtonEnabled(true);
                 findViewById(R.id.video_view).setVisibility(View.INVISIBLE);
                 findViewById(R.id.chartDisplay).setVisibility(View.VISIBLE);
                 findViewById(R.id.chooseGraph).setVisibility(View.VISIBLE);
@@ -145,10 +149,10 @@ public class DisplayDataActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //System.out.println("Graph option chosen");
                 releasePlayer();
-                showVideo.setEnabled(true);
-                showChart.setEnabled(true);
-                showGraph.setEnabled(true);
-                showObjectChooser.setEnabled(false);
+                setVideoButtonEnabled(true);
+                setGraphButtonEnabled(true);
+                setChartButtonEnabled(true);
+                setObjectsButtonEnabled(false);
                 findViewById(R.id.video_view).setVisibility(View.INVISIBLE);
                 findViewById(R.id.chartDisplay).setVisibility(View.INVISIBLE);
                 findViewById(R.id.chooseGraph).setVisibility(View.INVISIBLE);
@@ -280,6 +284,58 @@ public class DisplayDataActivity extends AppCompatActivity {
             currentWindow = player.getCurrentWindowIndex();
             player.release();
             player = null;
+        }
+    }
+
+    private void setVideoButtonEnabled(boolean e) {
+        ImageView img = showVideo.findViewById(R.id.imageView3);
+        TextView label = showVideo.findViewById(R.id.textView2);
+        showVideo.setEnabled(e);
+        if (!e) {
+            img.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.phyzmoBlue)));
+            label.setTextColor(getResources().getColor(R.color.phyzmoBlue));
+        } else {
+            img.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.ap_black)));
+            label.setTextColor(getResources().getColor(R.color.ap_black));
+        }
+    }
+
+    private void setGraphButtonEnabled(boolean e) {
+        ImageView img = showGraph.findViewById(R.id.imageView4);
+        TextView label = showGraph.findViewById(R.id.textview3);
+        showGraph.setEnabled(e);
+        if (!e) {
+            img.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.phyzmoBlue)));
+            label.setTextColor(getResources().getColor(R.color.phyzmoBlue));
+        } else {
+            img.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.ap_black)));
+            label.setTextColor(getResources().getColor(R.color.ap_black));
+        }
+    }
+
+    private void setChartButtonEnabled(boolean e) {
+        ImageView img = showChart.findViewById(R.id.imageView6);
+        TextView label = showChart.findViewById(R.id.textView4);
+        showChart.setEnabled(e);
+        if (!e) {
+            img.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.phyzmoBlue)));
+            label.setTextColor(getResources().getColor(R.color.phyzmoBlue));
+        } else {
+            img.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.ap_black)));
+            label.setTextColor(getResources().getColor(R.color.ap_black));
+        }
+    }
+
+    private void setObjectsButtonEnabled(boolean e) {
+        ImageView img = showObjectChooser.findViewById(R.id.imageView5);
+        TextView label = showObjectChooser.findViewById(R.id.textView5);
+        showObjectChooser.setEnabled(e);
+        if (!e) {
+            img.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.phyzmoBlue)));
+            label.setTextColor(getResources().getColor(R.color.phyzmoBlue));
+        } else {
+            img.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.ap_black)));
+            label.setTextColor(getResources().getColor(R.color.ap_black));
         }
     }
 }

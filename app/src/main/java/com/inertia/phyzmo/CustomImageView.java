@@ -109,7 +109,7 @@ public class CustomImageView extends AppCompatImageView {
     }
 
     public boolean hasValidLine() {
-        return firstPoint != null && secondPoint != null;
+        return firstPoint != null && secondPoint != null && !this.firstPoint.equals(secondPoint);
     }
 
     public static class Point {
@@ -118,6 +118,10 @@ public class CustomImageView extends AppCompatImageView {
         Point(float x, float y) {
             this.x = x;
             this.y = y;
+        }
+
+        public boolean equals(Point p) {
+            return this.x == p.x && this.y == p.y;
         }
     }
 }

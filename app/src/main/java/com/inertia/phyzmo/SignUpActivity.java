@@ -55,6 +55,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnFocusCha
 
     @Override
     public void onClick(View v) {
+        v.setEnabled(false);
         String name = nameInput.getText().toString();
         String emailAddress = emailInput.getText().toString();
         String password = passwordInput.getText().toString();
@@ -62,6 +63,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnFocusCha
         if (name.isEmpty() || emailAddress.isEmpty() || password.isEmpty()) {
             Toast.makeText(SignUpActivity.this, "Sign-up failed.",
                     Toast.LENGTH_SHORT).show();
+            v.setEnabled(true);
             return;
         }
 
@@ -84,6 +86,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnFocusCha
                 } else {
                     Toast.makeText(SignUpActivity.this, "Sign-up failed.", Toast.LENGTH_SHORT).show();
                     System.out.println(task.getException());
+                    v.setEnabled(true);
                 }
             }
         });
