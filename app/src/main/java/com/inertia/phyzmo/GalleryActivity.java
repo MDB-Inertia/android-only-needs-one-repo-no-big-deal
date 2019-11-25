@@ -137,7 +137,8 @@ public class GalleryActivity extends AppCompatActivity {
                 if (adapter.getSelectedToDelete().isEmpty()) {
                     return;
                 }
-                FirebaseUtils.deleteVideosForUser(GalleryActivity.this, adapter.getSelectedToDelete());
+                ArrayList<String> copyOfDeletedVideos = (ArrayList<String>) adapter.getSelectedToDelete().clone();
+                FirebaseUtils.deleteVideosForUser(GalleryActivity.this, copyOfDeletedVideos);
                 ArrayList<String> newData = adapter.getData();
                 newData.removeAll(adapter.getSelectedToDelete());
                 adapter.setData(newData);

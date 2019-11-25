@@ -131,8 +131,10 @@ public class FirebaseUtils {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         ArrayList<String> videoIds = new ArrayList<>();
                         for (DataSnapshot d: dataSnapshot.child("videoId").getChildren()) {
-                            if (selectedToDelete.contains(d.getValue().toString())) {
+                            if (!selectedToDelete.contains(d.getValue().toString())) {
                                 videoIds.add(d.getValue().toString());
+                            } else {
+                                System.out.println("Deleting video with ID#: " + d.getValue().toString());
                             }
                         }
                         specific_user.child("videoId").setValue(videoIds);
