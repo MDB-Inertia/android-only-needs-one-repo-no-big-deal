@@ -23,12 +23,13 @@
         tools:replace="android:icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".gallery.GalleryActivity">
+        <activity android:name=".StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".gallery.GalleryActivity" />
         <activity android:name=".authentication.LoginActivity"/>
         <activity android:name=".authentication.SignUpActivity"/>
         <activity android:name=".datadisplay.DisplayDataActivity" android:screenOrientation="portrait"/>
