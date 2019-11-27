@@ -1,4 +1,4 @@
-package com.inertia.phyzmo;
+package com.inertia.phyzmo.datadisplay.models;
 
 public class ObjectChoiceModel {
 

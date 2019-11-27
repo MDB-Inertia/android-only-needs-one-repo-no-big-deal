@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.inertia.phyzmo.CustomImageView
+    <com.inertia.phyzmo.datadisplay.views.DistanceSelectionView
         android:id="@+id/distanceCanvas"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
@@ -187,7 +187,7 @@
         app:title="A Simple XY Plot" />
 <!--    </LinearLayout>-->
 
-    <com.inertia.phyzmo.TableMainLayout
+    <com.inertia.phyzmo.datadisplay.views.TableMainLayout
         android:id="@+id/tableLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -197,7 +197,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/actionBar">
 
-    </com.inertia.phyzmo.TableMainLayout>
+    </com.inertia.phyzmo.datadisplay.views.TableMainLayout>
 
 <!--    <TextView-->
 <!--        android:id="@+id/video_view"-->

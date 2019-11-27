@@ -1,5 +1,13 @@
 <resources>
     <string name="app_name">Phyzmo</string>
+    <string name="welcome_no_name">Welcome</string>
+    <string name="welcome_name_prefix">Welcome, %1$s</string>
+    <string name="login_failed_notification">Login failed.</string>
+    <string name="signup_failed_notification">Sign-up failed.</string>
+    <string name="status_loading_data">Gathering data...</string>
+    <string name="analyze_objects_endpoint">https://us-central1-phyzmo.cloudfunctions.net/data-computation?objectsDataUri=https://storage.googleapis.com/phyzmo-videos/%1$s.json&amp;obj_descriptions=[%2$s]&amp;ref_list=[[%3$f,%4$f],[%5$f,%6$f],%7$f]</string>
+    <string name="status_analyzing_objects">Analyzing Objects</string>
+    <string name="track_objects_endpoint">https://us-central1-phyzmo.cloudfunctions.net/position-cv-all-saver?uri=gs://phyzmo.appspot.com/%1$s.mp4</string>
     <string-array name="graph_choices">
         <item>Total Distance</item>
         <item>Velocity</item>

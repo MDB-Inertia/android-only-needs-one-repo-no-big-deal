@@ -1,4 +1,4 @@
-package com.inertia.phyzmo;
+package com.inertia.phyzmo.datadisplay.views;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -14,11 +14,11 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.inertia.phyzmo.datadisplay.models.TableRowModel;
+
 import java.util.List;
 
 public class TableMainLayout extends RelativeLayout {
-
-    public final String TAG = "TableMainLayout.java";
 
     // set the header titles
     String headers[] = {
@@ -42,7 +42,7 @@ public class TableMainLayout extends RelativeLayout {
     Context context;
 
     int headerCellsWidth[] = new int[headers.length];
-    private List<SampleObject> sampleObjectList;
+    private List<TableRowModel> tableRowModelList;
 
     public TableMainLayout(Context context, AttributeSet s) {
 
@@ -76,9 +76,9 @@ public class TableMainLayout extends RelativeLayout {
         this.scrollViewD.setOverScrollMode(OVER_SCROLL_NEVER);
     }
 
-    public void setData(List<SampleObject> data) {
+    public void setData(List<TableRowModel> data) {
 
-        this.sampleObjectList = data;
+        this.tableRowModelList = data;
 
         tableA.removeAllViews();
         tableB.removeAllViews();
@@ -98,24 +98,8 @@ public class TableMainLayout extends RelativeLayout {
         this.resizeBodyTableRowHeight();
     }
 
-    // this is just the sample data
-    List<SampleObject> sampleObjects(){
-
-//        List<SampleObject> sampleObjects = new ArrayList<SampleObject>();
-//
-//        for(int x=1; x<=20; x++){
-//
-//            SampleObject sampleObject = new SampleObject(
-//                    "Col 1, Row " + x,
-//                    "Col 2, Row " + x,
-//                    "Col 3, Row " + x,
-//                    "Col 4, Row " + x
-//            );
-//
-//            sampleObjects.add(sampleObject);
-//        }
-
-        return this.sampleObjectList;
+    List<TableRowModel> sampleObjects(){
+        return this.tableRowModelList;
     }
 
     // initalized components
@@ -230,10 +214,10 @@ public class TableMainLayout extends RelativeLayout {
             Log.v("TableMainLayout.java", this.headerCellsWidth[x]+"");
         }
 
-        for(SampleObject sampleObject : this.sampleObjectList){
+        for(TableRowModel tableRowModel : this.tableRowModelList){
 
-            TableRow tableRowForTableC = this.tableRowForTableC(sampleObject);
-            TableRow taleRowForTableD = this.taleRowForTableD(sampleObject);
+            TableRow tableRowForTableC = this.tableRowForTableC(tableRowModel);
+            TableRow taleRowForTableD = this.taleRowForTableD(tableRowModel);
 
             tableRowForTableC.setBackgroundColor(Color.LTGRAY);
             taleRowForTableD.setBackgroundColor(Color.LTGRAY);
@@ -245,27 +229,27 @@ public class TableMainLayout extends RelativeLayout {
     }
 
     // a TableRow for table C
-    TableRow tableRowForTableC(SampleObject sampleObject){
+    TableRow tableRowForTableC(TableRowModel tableRowModel){
 
         TableRow.LayoutParams params = new TableRow.LayoutParams( this.headerCellsWidth[0],LayoutParams.MATCH_PARENT);
         params.setMargins(0, 2, 0, 0);
 
         TableRow tableRowForTableC = new TableRow(this.context);
-        TextView textView = this.bodyTextView(sampleObject.header1);
+        TextView textView = this.bodyTextView(tableRowModel.getHeader1());
         tableRowForTableC.addView(textView,params);
 
         return tableRowForTableC;
     }
 
-    TableRow taleRowForTableD(SampleObject sampleObject){
+    TableRow taleRowForTableD(TableRowModel tableRowModel){
 
         TableRow taleRowForTableD = new TableRow(this.context);
 
         int loopCount = ((TableRow)this.tableB.getChildAt(0)).getChildCount();
         String info[] = {
-                sampleObject.header2,
-                sampleObject.header3,
-                sampleObject.header4,
+                tableRowModel.getHeader2(),
+                tableRowModel.getHeader3(),
+                tableRowModel.getHeader4(),
         };
 
         for(int x=0 ; x<loopCount; x++){

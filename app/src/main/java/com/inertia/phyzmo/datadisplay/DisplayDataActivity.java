@@ -1,4 +1,4 @@
-package com.inertia.phyzmo;
+package com.inertia.phyzmo.datadisplay;
 
 import android.content.res.ColorStateList;
 import android.net.Uri;
@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +24,11 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.inertia.phyzmo.R;
+import com.inertia.phyzmo.datadisplay.models.ObjectChoiceModel;
+import com.inertia.phyzmo.datadisplay.views.DistanceSelectionView;
+import com.inertia.phyzmo.firebase.FirebaseDataUtils;
+import com.inertia.phyzmo.network.TrackObjectsTask;
 
 import java.util.ArrayList;
 
@@ -52,7 +56,7 @@ public class DisplayDataActivity extends AppCompatActivity {
     private SimpleExoPlayer player;
     private String videoUrl;
 
-    ObjectSelectionAdapter adapter;
+    private ObjectSelectionAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,7 +67,7 @@ public class DisplayDataActivity extends AppCompatActivity {
 
         distanceInput = findViewById(R.id.distanceInput);
 
-        ((CustomImageView) findViewById(R.id.distanceCanvas)).activity = this;
+        ((DistanceSelectionView) findViewById(R.id.distanceCanvas)).setActivity(this);
 
         showVideo = findViewById(R.id.displayVideo);
         showChart = findViewById(R.id.displayChart);
@@ -73,122 +77,93 @@ public class DisplayDataActivity extends AppCompatActivity {
         saveObjectSettings = findViewById(R.id.saveObjectsChosen);
 
         goBack = findViewById(R.id.home_button);
-        goBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        goBack.setOnClickListener(v -> finish());
 
         playerView = findViewById(R.id.video_view);
 
         setGraphButtonEnabled(false);
 
-        showVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //System.out.println("Video option chosen");
-                initializePlayer(videoUrl);
-                setVideoButtonEnabled(false);
-                setChartButtonEnabled(true);
-                setGraphButtonEnabled(true);
-                setObjectsButtonEnabled(true);
-                findViewById(R.id.video_view).setVisibility(View.VISIBLE);
-                findViewById(R.id.chartDisplay).setVisibility(View.INVISIBLE);
-                findViewById(R.id.chooseGraph).setVisibility(View.INVISIBLE);
-                findViewById(R.id.tableLayout).setVisibility(View.INVISIBLE);
-                findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
-                saveObjectSettings.setVisibility(View.INVISIBLE);
-                findViewById(R.id.distanceObjectSwitch).setVisibility(View.INVISIBLE);
-                findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
-            }
+        showVideo.setOnClickListener(v -> {
+            initializePlayer(videoUrl);
+            setVideoButtonEnabled(false);
+            setChartButtonEnabled(true);
+            setGraphButtonEnabled(true);
+            setObjectsButtonEnabled(true);
+            findViewById(R.id.video_view).setVisibility(View.VISIBLE);
+            findViewById(R.id.chartDisplay).setVisibility(View.INVISIBLE);
+            findViewById(R.id.chooseGraph).setVisibility(View.INVISIBLE);
+            findViewById(R.id.tableLayout).setVisibility(View.INVISIBLE);
+            findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
+            saveObjectSettings.setVisibility(View.INVISIBLE);
+            findViewById(R.id.distanceObjectSwitch).setVisibility(View.INVISIBLE);
+            findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
         });
 
-        showChart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //System.out.println("Chart option chosen");
-                releasePlayer();
-                setVideoButtonEnabled(true);
-                setChartButtonEnabled(false);
-                setGraphButtonEnabled(true);
-                setObjectsButtonEnabled(true);
-                findViewById(R.id.video_view).setVisibility(View.INVISIBLE);
-                findViewById(R.id.chartDisplay).setVisibility(View.INVISIBLE);
-                findViewById(R.id.chooseGraph).setVisibility(View.INVISIBLE);
-                findViewById(R.id.tableLayout).setVisibility(View.VISIBLE);
-                findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
-                saveObjectSettings.setVisibility(View.INVISIBLE);
-                findViewById(R.id.distanceObjectSwitch).setVisibility(View.INVISIBLE);
-                findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
-            }
+        showChart.setOnClickListener(v -> {
+            releasePlayer();
+            setVideoButtonEnabled(true);
+            setChartButtonEnabled(false);
+            setGraphButtonEnabled(true);
+            setObjectsButtonEnabled(true);
+            findViewById(R.id.video_view).setVisibility(View.INVISIBLE);
+            findViewById(R.id.chartDisplay).setVisibility(View.INVISIBLE);
+            findViewById(R.id.chooseGraph).setVisibility(View.INVISIBLE);
+            findViewById(R.id.tableLayout).setVisibility(View.VISIBLE);
+            findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
+            saveObjectSettings.setVisibility(View.INVISIBLE);
+            findViewById(R.id.distanceObjectSwitch).setVisibility(View.INVISIBLE);
+            findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
         });
 
-        showGraph.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //System.out.println("Graph option chosen");
-                releasePlayer();
-                setVideoButtonEnabled(true);
-                setChartButtonEnabled(true);
-                setGraphButtonEnabled(false);
-                setObjectsButtonEnabled(true);
-                findViewById(R.id.video_view).setVisibility(View.INVISIBLE);
-                findViewById(R.id.chartDisplay).setVisibility(View.VISIBLE);
-                findViewById(R.id.chooseGraph).setVisibility(View.VISIBLE);
-                findViewById(R.id.tableLayout).setVisibility(View.INVISIBLE);
-                findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
-                saveObjectSettings.setVisibility(View.INVISIBLE);
-                findViewById(R.id.distanceObjectSwitch).setVisibility(View.INVISIBLE);
-                findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
-            }
+        showGraph.setOnClickListener(v -> {
+            releasePlayer();
+            setVideoButtonEnabled(true);
+            setChartButtonEnabled(true);
+            setGraphButtonEnabled(false);
+            setObjectsButtonEnabled(true);
+            findViewById(R.id.video_view).setVisibility(View.INVISIBLE);
+            findViewById(R.id.chartDisplay).setVisibility(View.VISIBLE);
+            findViewById(R.id.chooseGraph).setVisibility(View.VISIBLE);
+            findViewById(R.id.tableLayout).setVisibility(View.INVISIBLE);
+            findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
+            saveObjectSettings.setVisibility(View.INVISIBLE);
+            findViewById(R.id.distanceObjectSwitch).setVisibility(View.INVISIBLE);
+            findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
         });
 
-        showObjectChooser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //System.out.println("Graph option chosen");
-                releasePlayer();
-                setVideoButtonEnabled(true);
-                setGraphButtonEnabled(true);
-                setChartButtonEnabled(true);
-                setObjectsButtonEnabled(false);
-                findViewById(R.id.video_view).setVisibility(View.INVISIBLE);
-                findViewById(R.id.chartDisplay).setVisibility(View.INVISIBLE);
-                findViewById(R.id.chooseGraph).setVisibility(View.INVISIBLE);
-                findViewById(R.id.tableLayout).setVisibility(View.INVISIBLE);
-                findViewById(R.id.objectSelectionView).setVisibility(View.VISIBLE);
-                saveObjectSettings.setVisibility(View.VISIBLE);
-                findViewById(R.id.distanceObjectSwitch).setVisibility(View.VISIBLE);
-                findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
-                findViewById(R.id.switchToObjects).setEnabled(false);
-                findViewById(R.id.switchToDistance).setEnabled(true);
-                findViewById(R.id.distanceInput).setEnabled(false);
-            }
+        showObjectChooser.setOnClickListener(v -> {
+            releasePlayer();
+            setVideoButtonEnabled(true);
+            setGraphButtonEnabled(true);
+            setChartButtonEnabled(true);
+            setObjectsButtonEnabled(false);
+            findViewById(R.id.video_view).setVisibility(View.INVISIBLE);
+            findViewById(R.id.chartDisplay).setVisibility(View.INVISIBLE);
+            findViewById(R.id.chooseGraph).setVisibility(View.INVISIBLE);
+            findViewById(R.id.tableLayout).setVisibility(View.INVISIBLE);
+            findViewById(R.id.objectSelectionView).setVisibility(View.VISIBLE);
+            saveObjectSettings.setVisibility(View.VISIBLE);
+            findViewById(R.id.distanceObjectSwitch).setVisibility(View.VISIBLE);
+            findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
+            findViewById(R.id.switchToObjects).setEnabled(false);
+            findViewById(R.id.switchToDistance).setEnabled(true);
+            findViewById(R.id.distanceInput).setEnabled(false);
         });
 
-        findViewById(R.id.switchToObjects).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                findViewById(R.id.switchToObjects).setEnabled(false);
-                findViewById(R.id.switchToDistance).setEnabled(true);
-                findViewById(R.id.objectSelectionView).setVisibility(View.VISIBLE);
-                findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
-                findViewById(R.id.distanceInput).setEnabled(false);
-                //saveObjectSettings.setVisibility(View.VISIBLE);
-            }
+        findViewById(R.id.switchToObjects).setOnClickListener(v -> {
+            findViewById(R.id.switchToObjects).setEnabled(false);
+            findViewById(R.id.switchToDistance).setEnabled(true);
+            findViewById(R.id.objectSelectionView).setVisibility(View.VISIBLE);
+            findViewById(R.id.distanceCanvas).setVisibility(View.INVISIBLE);
+            findViewById(R.id.distanceInput).setEnabled(false);
         });
 
-        findViewById(R.id.switchToDistance).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                findViewById(R.id.switchToObjects).setEnabled(true);
-                findViewById(R.id.switchToDistance).setEnabled(false);
-                findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
-                findViewById(R.id.distanceCanvas).setVisibility(View.VISIBLE);
-                findViewById(R.id.distanceInput).setEnabled(true);
-                //saveObjectSettings.setVisibility(View.INVISIBLE);
-            }
+        findViewById(R.id.switchToDistance).setOnClickListener(v -> {
+            findViewById(R.id.switchToObjects).setEnabled(true);
+            findViewById(R.id.switchToDistance).setEnabled(false);
+            findViewById(R.id.objectSelectionView).setVisibility(View.INVISIBLE);
+            findViewById(R.id.distanceCanvas).setVisibility(View.VISIBLE);
+            findViewById(R.id.distanceInput).setEnabled(true);
         });
 
         objectSelectionView = findViewById(R.id.objectSelectionView);
@@ -218,28 +193,21 @@ public class DisplayDataActivity extends AppCompatActivity {
 
         System.out.println(getIntent().getExtras().getString("video_url"));
         if (!getIntent().getExtras().getBoolean("existing_video")) {
-            FirebaseUtils.trackObjects(this, getIntent().getExtras().getString("video_url"));
+            TrackObjectsTask.trackObjects(this, getIntent().getExtras().getString("video_url"));
         } else {
-            FirebaseUtils.openExistingVideo(getIntent().getExtras().getString("video_url").replace(".mp4", ""),this);
-            statusLine.setText("Gathering data...");
+            FirebaseDataUtils.openExistingVideo(getIntent().getExtras().getString("video_url"),this);
+            statusLine.setText(getString(R.string.status_loading_data));
         }
-        //FirebaseUtils.uploadFile(this, getIntent().getExtras().getString("video_url"));
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        if (Util.SDK_INT >= 24) {
-            //initializePlayer();
-        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if ((Util.SDK_INT < 24 || player == null)) {
-            //initializePlayer();
-        }
     }
 
     @Override
@@ -337,5 +305,9 @@ public class DisplayDataActivity extends AppCompatActivity {
             img.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.ap_black)));
             label.setTextColor(getResources().getColor(R.color.ap_black));
         }
+    }
+
+    public ObjectSelectionAdapter getAdapter() {
+        return this.adapter;
     }
 }

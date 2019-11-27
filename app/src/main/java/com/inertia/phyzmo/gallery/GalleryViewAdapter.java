@@ -1,4 +1,4 @@
-package com.inertia.phyzmo;
+package com.inertia.phyzmo.gallery;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,10 +19,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.inertia.phyzmo.R;
+import com.inertia.phyzmo.datadisplay.DisplayDataActivity;
+import com.inertia.phyzmo.firebase.FirebaseStorageUtils;
 
 import net.igenius.customcheckbox.CustomCheckBox;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class GalleryViewAdapter extends RecyclerView.Adapter<GalleryViewAdapter.ViewHolder> {
@@ -62,7 +64,7 @@ public class GalleryViewAdapter extends RecyclerView.Adapter<GalleryViewAdapter.
         requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(75));
 
         Glide.with(holder.thumbnail.getContext())
-                .load("https://storage.googleapis.com/phyzmo.appspot.com/" + mData.get(position) + ".jpg")
+                .load(FirebaseStorageUtils.getThumbnailUrl(mData.get(position)))
                 .apply(requestOptions)
                 .placeholder(R.drawable.gray_square)
                 .dontAnimate()
@@ -78,38 +80,29 @@ public class GalleryViewAdapter extends RecyclerView.Adapter<GalleryViewAdapter.
 
         holder.checkbox.setClickable(false);
 
-        holder.checkbox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                holder.thumbnail.callOnClick();
-                //holder.checkbox.setChecked(!holder.checkbox.isChecked());
-            }
-        });
+        holder.checkbox.setOnClickListener(v -> holder.thumbnail.callOnClick());
 
-        holder.thumbnail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mSelectMode) {
-                    holder.checkbox.setChecked(!holder.checkbox.isChecked(), true);
-                    if (holder.checkbox.isChecked()) {
-                        mSelectedToDelete.add(mData.get(position));
-                    } else {
-                        mSelectedToDelete.remove(mData.get(position));
-                    }
-                    if (mSelectedToDelete.isEmpty()) {
-                        mActivity.findViewById(R.id.deleteVideo).setBackgroundTintList(ColorStateList.valueOf(mActivity.getResources().getColor(R.color.ap_gray)));
-                    } else {
-                        mActivity.findViewById(R.id.deleteVideo).setBackgroundTintList(ColorStateList.valueOf(mActivity.getResources().getColor(R.color.red_btn_bg_color)));
-                    }
+        holder.thumbnail.setOnClickListener(v -> {
+            if (mSelectMode) {
+                holder.checkbox.setChecked(!holder.checkbox.isChecked(), true);
+                if (holder.checkbox.isChecked()) {
+                    mSelectedToDelete.add(mData.get(position));
                 } else {
-                    System.out.println("Thumbnail for video with ID=" + mData.get(position) + " clicked.");
-                    Intent intent = new Intent(mContext, DisplayDataActivity.class);
-                    Bundle mBundle = new Bundle();
-                    mBundle.putString("video_url", mData.get(position) + ".mp4");
-                    mBundle.putBoolean("existing_video", true);
-                    intent.putExtras(mBundle);
-                    mContext.startActivity(intent);
+                    mSelectedToDelete.remove(mData.get(position));
                 }
+                if (mSelectedToDelete.isEmpty()) {
+                    mActivity.findViewById(R.id.deleteVideo).setBackgroundTintList(ColorStateList.valueOf(mActivity.getResources().getColor(R.color.ap_gray)));
+                } else {
+                    mActivity.findViewById(R.id.deleteVideo).setBackgroundTintList(ColorStateList.valueOf(mActivity.getResources().getColor(R.color.red_btn_bg_color)));
+                }
+            } else {
+                System.out.println("Thumbnail for video with ID=" + mData.get(position) + " clicked.");
+                Intent intent = new Intent(mContext, DisplayDataActivity.class);
+                Bundle mBundle = new Bundle();
+                mBundle.putString("video_url", mData.get(position));
+                mBundle.putBoolean("existing_video", true);
+                intent.putExtras(mBundle);
+                mContext.startActivity(intent);
             }
         });
     }
@@ -162,14 +155,6 @@ public class GalleryViewAdapter extends RecyclerView.Adapter<GalleryViewAdapter.
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
         }
-    }
-
-    String getItem(int id) {
-        return mData.get(id);
-    }
-
-    void setClickListener(ItemClickListener itemClickListener) {
-        this.mClickListener = itemClickListener;
     }
 
     public interface ItemClickListener {

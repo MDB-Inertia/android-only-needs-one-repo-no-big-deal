@@ -1,4 +1,4 @@
-package com.inertia.phyzmo;
+package com.inertia.phyzmo.authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,15 +7,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
+import com.inertia.phyzmo.R;
+import com.inertia.phyzmo.firebase.FirebaseAuthUtils;
+import com.inertia.phyzmo.utils.Utils;
 
 public class LoginActivity extends AppCompatActivity implements View.OnFocusChangeListener, View.OnClickListener, View.OnTouchListener {
 
@@ -37,7 +34,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnFocusChan
         passwordInput.setOnFocusChangeListener(this);
 
         loginButton.setOnClickListener(this);
-
         toggleSignUp.setOnTouchListener(this);
     }
 
@@ -50,35 +46,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnFocusChan
 
     @Override
     public void onClick(View v) {
-        v.setEnabled(false);
-
         String emailAddress = emailInput.getText().toString();
         String password = passwordInput.getText().toString();
-
-        if (emailAddress.isEmpty() || password.isEmpty()) {
-            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                    Toast.LENGTH_SHORT).show();
-            v.setEnabled(true);
-            return;
-        }
-
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        auth.signInWithEmailAndPassword(emailAddress, password)
-            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    Intent intent = new Intent(LoginActivity.this, GalleryActivity.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    System.out.println("signInWithEmail:failure" + task.getException());
-                    Toast.makeText(LoginActivity.this, "Authentication failed.",
-                            Toast.LENGTH_SHORT).show();
-                    v.setEnabled(true);
-                }
-            }
-        });
+        FirebaseAuthUtils.login(this, emailAddress, password);
     }
 
     @Override
