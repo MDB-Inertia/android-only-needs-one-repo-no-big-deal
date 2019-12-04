@@ -142,8 +142,9 @@ public class AnalyzeObjectsTask extends RequestTask {
         DistanceSelectionView distanceCanvas = activity.findViewById(R.id.distanceCanvas);
         distanceCanvas.drawLine(point1.get(0).floatValue(), point1.get(1).floatValue(), point2.get(0).floatValue(), point2.get(1).floatValue());
 
-        activity.findViewById(R.id.displayVideo).setEnabled(true);
-        activity.findViewById(R.id.displayChart).setEnabled(true);
-        activity.findViewById(R.id.displayObjectChooser).setEnabled(true);
+        activity.setVideoButtonEnabled(true);
+        activity.setGraphButtonEnabled(false);
+        activity.setChartButtonEnabled(true);
+        activity.setObjectsButtonEnabled(true);
     }
 }

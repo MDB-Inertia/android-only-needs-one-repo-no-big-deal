@@ -30,8 +30,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".gallery.GalleryActivity" />
-        <activity android:name=".authentication.LoginActivity"/>
-        <activity android:name=".authentication.SignUpActivity"/>
+        <activity android:name=".authentication.LoginActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".authentication.SignUpActivity" android:screenOrientation="portrait"/>
         <activity android:name=".datadisplay.DisplayDataActivity" android:screenOrientation="portrait"/>
         <uses-library android:name="org.apache.http.legacy" android:required="false"/>
     </application>

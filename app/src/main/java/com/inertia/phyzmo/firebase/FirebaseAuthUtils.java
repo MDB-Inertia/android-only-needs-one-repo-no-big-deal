@@ -46,7 +46,7 @@ public class FirebaseAuthUtils {
     }
 
     public static void signUp(SignUpActivity signUpActivity, String emailAddress, String password, String name) {
-        Button signUpButton = signUpActivity.findViewById(R.id.loginButton);
+        Button signUpButton = signUpActivity.findViewById(R.id.signUpButton);
         FirebaseAuth auth = FirebaseAuth.getInstance();
         Toast failedSignUp =  Toast.makeText(signUpActivity, signUpActivity.getString(R.string.signup_failed_notification), Toast.LENGTH_SHORT);
 

@@ -31,9 +31,7 @@ public class GalleryViewAdapter extends RecyclerView.Adapter<GalleryViewAdapter.
 
     private ArrayList<String> mData;
     private LayoutInflater mInflater;
-    private ItemClickListener mClickListener;
     private Context mContext;
-    private RecyclerView mRecyclerView;
     private GalleryActivity mActivity;
     private boolean mSelectMode;
     private ArrayList<String> mSelectedToDelete;
@@ -138,7 +136,7 @@ public class GalleryViewAdapter extends RecyclerView.Adapter<GalleryViewAdapter.
         return mData;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView thumbnail;
         View itemView;
         CustomCheckBox checkbox;
@@ -148,23 +146,12 @@ public class GalleryViewAdapter extends RecyclerView.Adapter<GalleryViewAdapter.
             this.itemView = itemView;
             thumbnail = itemView.findViewById(R.id.thumbnailImage);
             checkbox = itemView.findViewById(R.id.deleteObjectCheckbox);
-            itemView.setOnClickListener(this);
         }
-
-        @Override
-        public void onClick(View view) {
-            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
-        }
-    }
-
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
     }
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
 
-        mRecyclerView = recyclerView;
     }
 }

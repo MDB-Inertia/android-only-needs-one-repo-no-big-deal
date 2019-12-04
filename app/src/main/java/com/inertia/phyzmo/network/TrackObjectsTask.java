@@ -62,15 +62,17 @@ public class TrackObjectsTask extends RequestTask {
         ConstraintLayout showObjectChooser = activity.findViewById(R.id.displayObjectChooser);
         showObjectChooser.callOnClick();
 
+        activity.setVideoButtonEnabled(true);
+        activity.setChartButtonEnabled(true);
+        activity.setGraphButtonEnabled(true);
         activity.findViewById(R.id.displayVideo).setEnabled(false);
-        activity.findViewById(R.id.displayChart).setEnabled(false);
         activity.findViewById(R.id.displayGraph).setEnabled(false);
+        activity.findViewById(R.id.displayChart).setEnabled(false);
 
         FirebaseDataUtils.addVideoIdToUser(videoId, FirebaseAuth.getInstance().getCurrentUser());
     }
 
     public static void trackObjects(DisplayDataActivity a, String id) {
         new TrackObjectsTask(a, id).execute(a.getString(R.string.track_objects_endpoint, id));
-
     }
 }

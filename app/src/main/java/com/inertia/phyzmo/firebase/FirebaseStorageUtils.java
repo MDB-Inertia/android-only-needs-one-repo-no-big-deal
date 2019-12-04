@@ -1,6 +1,7 @@
 package com.inertia.phyzmo.firebase;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,7 +28,6 @@ public class FirebaseStorageUtils {
     }
 
     public static void uploadFile(final Activity a, String videoPath, boolean deleteAfter) {
-
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         Uri file = Uri.fromFile(new File(videoPath));
         String videoId = UUID.randomUUID().toString();
@@ -42,11 +42,23 @@ public class FirebaseStorageUtils {
                         mBundle.putBoolean("existing_video", false);
                         intent.putExtras(mBundle);
                         a.startActivity(intent);
+                        if (deleteAfter) {
+                            deleteFileFromDevice(videoPath, a.getApplicationContext());
+                        }
                     });
                 })
                 .addOnFailureListener(exception -> {
                     System.out.println("Video upload failed!");
+                    deleteFileFromDevice(videoPath, a.getApplicationContext());
                     exception.printStackTrace();
                 });
+    }
+
+    public static void deleteFileFromDevice(String path, Context c) {
+        File file = new File(path);
+        if (file != null) {
+            file.delete();
+        }
+        c.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(path))));
     }
 }

@@ -81,7 +81,14 @@ public class DisplayDataActivity extends AppCompatActivity {
 
         playerView = findViewById(R.id.video_view);
 
-        setGraphButtonEnabled(false);
+        setVideoButtonEnabled(true);
+        setGraphButtonEnabled(true);
+        setChartButtonEnabled(true);
+        setObjectsButtonEnabled(true);
+        showVideo.setEnabled(false);
+        showGraph.setEnabled(false);
+        showChart.setEnabled(false);
+        showObjectChooser.setEnabled(false);
 
         showVideo.setOnClickListener(v -> {
             initializePlayer(videoUrl);
@@ -255,7 +262,7 @@ public class DisplayDataActivity extends AppCompatActivity {
         }
     }
 
-    private void setVideoButtonEnabled(boolean e) {
+    public void setVideoButtonEnabled(boolean e) {
         ImageView img = showVideo.findViewById(R.id.imageView3);
         TextView label = showVideo.findViewById(R.id.textView2);
         showVideo.setEnabled(e);
@@ -268,7 +275,7 @@ public class DisplayDataActivity extends AppCompatActivity {
         }
     }
 
-    private void setGraphButtonEnabled(boolean e) {
+    public void setGraphButtonEnabled(boolean e) {
         ImageView img = showGraph.findViewById(R.id.imageView4);
         TextView label = showGraph.findViewById(R.id.textview3);
         showGraph.setEnabled(e);
@@ -281,7 +288,7 @@ public class DisplayDataActivity extends AppCompatActivity {
         }
     }
 
-    private void setChartButtonEnabled(boolean e) {
+    public void setChartButtonEnabled(boolean e) {
         ImageView img = showChart.findViewById(R.id.imageView6);
         TextView label = showChart.findViewById(R.id.textView4);
         showChart.setEnabled(e);
@@ -294,7 +301,7 @@ public class DisplayDataActivity extends AppCompatActivity {
         }
     }
 
-    private void setObjectsButtonEnabled(boolean e) {
+    public void setObjectsButtonEnabled(boolean e) {
         ImageView img = showObjectChooser.findViewById(R.id.imageView5);
         TextView label = showObjectChooser.findViewById(R.id.textView5);
         showObjectChooser.setEnabled(e);
