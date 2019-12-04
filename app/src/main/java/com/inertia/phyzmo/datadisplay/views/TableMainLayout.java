@@ -163,8 +163,6 @@ public class TableMainLayout extends RelativeLayout {
 
     }
 
-
-
     private void addTableRowToTableA(){
         this.tableA.addView(this.componentATableRow());
     }
@@ -178,7 +176,7 @@ public class TableMainLayout extends RelativeLayout {
 
         TableRow componentATableRow = new TableRow(this.context);
         TextView textView = this.headerTextView(this.headers[0]);
-        textView.setPadding(5, 50, 5, 50);
+        textView.setPadding(35, 50, 35, 50);
         textView.setTypeface(textView.getTypeface(), Typeface.BOLD);
 
         componentATableRow.addView(textView);
@@ -198,7 +196,7 @@ public class TableMainLayout extends RelativeLayout {
         for(int x=0; x<(headerFieldCount-1); x++){
             TextView textView = this.headerTextView(this.headers[x+1]);
             textView.setTypeface(textView.getTypeface(), Typeface.BOLD);
-            textView.setPadding(5, 50, 5, 50);
+            textView.setPadding(45, 50, 45, 50);
             textView.setLayoutParams(params);
             componentBTableRow.addView(textView);
         }
