@@ -26,7 +26,7 @@ public class FirebaseStorageUtils {
         return "https://storage.googleapis.com/phyzmo.appspot.com/" + videoId + ".jpg";
     }
 
-    public static void uploadFile(final Activity a, String videoPath) {
+    public static void uploadFile(final Activity a, String videoPath, boolean deleteAfter) {
 
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         Uri file = Uri.fromFile(new File(videoPath));
