@@ -135,7 +135,6 @@ public class GalleryActivity extends AppCompatActivity {
                 Uri videoUri = data.getData();
                 String path = Utils.getPathFromURI(this, videoUri);
                 FirebaseStorageUtils.uploadFile(this, path, true);
-
             }
         }
     }

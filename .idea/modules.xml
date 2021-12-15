@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Phyzmo.iml" filepath="$PROJECT_DIR$/Phyzmo.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Phyzmo.iml" filepath="$PROJECT_DIR$/.idea/modules/Phyzmo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Phyzmo.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Phyzmo.app.iml" />
     </modules>
   </component>
 </project>
